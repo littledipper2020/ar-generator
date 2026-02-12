@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -33,7 +33,7 @@
     }
 
     body {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #f8f9fa 0%, #e8eef3 100%);
       color: var(--text-dark);
       line-height: 1.6;
@@ -257,6 +257,88 @@
 
     .department-item input {
       margin-bottom: 0;
+    }
+
+    .department-card {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      background: var(--bg-white);
+    }
+
+    .department-header {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .submenu-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px dashed var(--border);
+    }
+
+    .submenu-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      align-items: center;
+      padding-left: 24px;
+    }
+
+    .submenu-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-medium);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      transition: background 0.3s ease;
+    }
+
+    .switch.active {
+      background: var(--primary);
+    }
+
+    .switch-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    .switch.active .switch-slider {
+      transform: translateX(24px);
+    }
+
+    .after-hours-section {
+      background: var(--bg-gray);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
     }
 
     .btn {
@@ -650,10 +732,12 @@
         tone: 'professional',
         hours: '',
         departments: [
-          { name: 'Sales', extension: '1' },
-          { name: 'Support', extension: '2' }
+          { name: 'Sales', extension: '1', hasSubmenu: false, submenuOptions: [] },
+          { name: 'Support', extension: '2', hasSubmenu: false, submenuOptions: [] }
         ],
         specialInstructions: '',
+        enableAfterHours: false,
+        afterHoursMessage: '',
         email: ''
       });
       const [generatedScript, setGeneratedScript] = useState('');
@@ -674,7 +758,7 @@
       const addDepartment = () => {
         setFormData(prev => ({
           ...prev,
-          departments: [...prev.departments, { name: '', extension: '' }]
+          departments: [...prev.departments, { name: '', extension: '', hasSubmenu: false, submenuOptions: [] }]
         }));
       };
 
@@ -694,8 +778,52 @@
         }));
       };
 
+      const toggleSubmenu = (deptIndex) => {
+        setFormData(prev => ({
+          ...prev,
+          departments: prev.departments.map((dept, i) => 
+            i === deptIndex ? { ...dept, hasSubmenu: !dept.hasSubmenu, submenuOptions: dept.hasSubmenu ? [] : [{ name: '', extension: '' }] } : dept
+          )
+        }));
+      };
+
+      const addSubmenuOption = (deptIndex) => {
+        setFormData(prev => ({
+          ...prev,
+          departments: prev.departments.map((dept, i) => 
+            i === deptIndex ? { ...dept, submenuOptions: [...dept.submenuOptions, { name: '', extension: '' }] } : dept
+          )
+        }));
+      };
+
+      const updateSubmenuOption = (deptIndex, subIndex, field, value) => {
+        setFormData(prev => ({
+          ...prev,
+          departments: prev.departments.map((dept, i) => 
+            i === deptIndex ? {
+              ...dept,
+              submenuOptions: dept.submenuOptions.map((opt, j) => 
+                j === subIndex ? { ...opt, [field]: value } : opt
+              )
+            } : dept
+          )
+        }));
+      };
+
+      const removeSubmenuOption = (deptIndex, subIndex) => {
+        setFormData(prev => ({
+          ...prev,
+          departments: prev.departments.map((dept, i) => 
+            i === deptIndex ? {
+              ...dept,
+              submenuOptions: dept.submenuOptions.filter((_, j) => j !== subIndex)
+            } : dept
+          )
+        }));
+      };
+
       const generateScript = () => {
-        const { businessName, industry, tone, hours, departments, specialInstructions } = formData;
+        const { businessName, industry, tone, hours, departments, specialInstructions, enableAfterHours, afterHoursMessage } = formData;
         
         let greeting = '';
         if (tone === 'friendly') {
@@ -719,9 +847,30 @@
 
         let specialText = specialInstructions ? `\n\n${specialInstructions}` : '';
 
-        const script = `${greeting}${hoursText}${menuText}${specialText}\n\nWe appreciate your patience and look forward to assisting you.`;
+        const mainScript = `${greeting}${hoursText}${menuText}${specialText}\n\nWe appreciate your patience and look forward to assisting you.`;
         
-        setGeneratedScript(script);
+        // Generate after-hours script if enabled
+        let afterHoursScript = '';
+        if (enableAfterHours) {
+          const customMessage = afterHoursMessage || `We're currently closed. Our office hours are ${hours || 'Monday through Friday, 9 AM to 5 PM'}.`;
+          afterHoursScript = `\n\n--- AFTER HOURS SCRIPT ---\n\nThank you for calling ${businessName}. ${customMessage}\n\nFor urgent matters, please press 9. Otherwise, please leave a message after the tone and we'll return your call as soon as possible. Thank you.`;
+        }
+
+        // Generate submenu scripts
+        let submenuScripts = '';
+        departments.forEach((dept, deptIndex) => {
+          if (dept.hasSubmenu && dept.submenuOptions.length > 0) {
+            submenuScripts += `\n\n--- SUBMENU: ${dept.name.toUpperCase()} (Extension ${dept.extension}) ---\n\nYou've reached ${dept.name}. Please select from the following options:`;
+            dept.submenuOptions.forEach((option, optIndex) => {
+              if (option.name && option.extension) {
+                submenuScripts += `\nPress ${option.extension} for ${option.name}.`;
+              }
+            });
+            submenuScripts += '\nPress 0 to return to the main menu.';
+          }
+        });
+        
+        setGeneratedScript(mainScript + afterHoursScript + submenuScripts);
       };
 
       const nextStep = () => {
@@ -888,33 +1037,89 @@
                 <div className="form-section">
                   <h2 className="section-title">Call Routing & Extensions</h2>
                   <p className="section-description">
-                    Configure your departments and extension numbers.
+                    Configure your departments, extensions, and optional submenus.
                   </p>
 
                   <div className="department-list">
                     {formData.departments.map((dept, index) => (
-                      <div key={index} className="department-item">
-                        <input
-                          type="text"
-                          placeholder="Department name"
-                          value={dept.name}
-                          onChange={(e) => updateDepartment(index, 'name', e.target.value)}
-                          style={{ flex: 2 }}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Ext"
-                          value={dept.extension}
-                          onChange={(e) => updateDepartment(index, 'extension', e.target.value)}
-                          style={{ flex: 1 }}
-                        />
-                        {formData.departments.length > 1 && (
-                          <button
-                            className="btn btn-danger btn-small"
-                            onClick={() => removeDepartment(index)}
-                          >
-                            Remove
-                          </button>
+                      <div key={index} className="department-card">
+                        <div className="department-header">
+                          <input
+                            type="text"
+                            placeholder="Department name"
+                            value={dept.name}
+                            onChange={(e) => updateDepartment(index, 'name', e.target.value)}
+                            style={{ flex: 2 }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Ext"
+                            value={dept.extension}
+                            onChange={(e) => updateDepartment(index, 'extension', e.target.value)}
+                            style={{ flex: 1 }}
+                          />
+                          {formData.departments.length > 1 && (
+                            <button
+                              className="btn btn-danger btn-small"
+                              onClick={() => removeDepartment(index)}
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+
+                        <div 
+                          className="toggle-switch" 
+                          onClick={() => toggleSubmenu(index)}
+                          style={{ marginTop: '12px' }}
+                        >
+                          <div className={`switch ${dept.hasSubmenu ? 'active' : ''}`}>
+                            <div className="switch-slider"></div>
+                          </div>
+                          <span style={{ fontSize: '0.9rem', color: 'var(--text-medium)' }}>
+                            Add submenu options
+                          </span>
+                        </div>
+
+                        {dept.hasSubmenu && (
+                          <div className="submenu-section">
+                            <div className="submenu-label">
+                              📋 Submenu for {dept.name || 'this department'}
+                            </div>
+                            {dept.submenuOptions.map((option, subIndex) => (
+                              <div key={subIndex} className="submenu-item">
+                                <input
+                                  type="text"
+                                  placeholder="Option name"
+                                  value={option.name}
+                                  onChange={(e) => updateSubmenuOption(index, subIndex, 'name', e.target.value)}
+                                  style={{ flex: 2 }}
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="Ext"
+                                  value={option.extension}
+                                  onChange={(e) => updateSubmenuOption(index, subIndex, 'extension', e.target.value)}
+                                  style={{ flex: 1 }}
+                                />
+                                {dept.submenuOptions.length > 1 && (
+                                  <button
+                                    className="btn btn-danger btn-small"
+                                    onClick={() => removeSubmenuOption(index, subIndex)}
+                                  >
+                                    Remove
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                            <button
+                              className="btn btn-secondary btn-small"
+                              onClick={() => addSubmenuOption(index)}
+                              style={{ marginTop: '8px', marginLeft: '24px' }}
+                            >
+                              + Add Submenu Option
+                            </button>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -937,6 +1142,36 @@
                       onChange={(e) => updateFormData('specialInstructions', e.target.value)}
                       placeholder="e.g., For emergencies, press 9. Visit our website at..."
                     />
+                  </div>
+
+                  <div className="after-hours-section">
+                    <div 
+                      className="toggle-switch" 
+                      onClick={() => updateFormData('enableAfterHours', !formData.enableAfterHours)}
+                      style={{ marginBottom: '16px' }}
+                    >
+                      <div className={`switch ${formData.enableAfterHours ? 'active' : ''}`}>
+                        <div className="switch-slider"></div>
+                      </div>
+                      <span style={{ fontSize: '1rem', fontWeight: '600' }}>
+                        🌙 Create After-Hours Script
+                      </span>
+                    </div>
+
+                    {formData.enableAfterHours && (
+                      <div className="form-group" style={{ marginBottom: '0' }}>
+                        <label>
+                          After-Hours Message
+                          <span className="label-helper">(Leave blank for default)</span>
+                        </label>
+                        <textarea
+                          value={formData.afterHoursMessage}
+                          onChange={(e) => updateFormData('afterHoursMessage', e.target.value)}
+                          placeholder="Custom message for when your office is closed..."
+                          style={{ minHeight: '80px' }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
