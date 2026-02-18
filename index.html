@@ -1,198 +1,335 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Business Automated Receptionist Generator</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Talk Automated Receptionist Generator | Office Communications</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Karla; max-width: 850px; margin: auto; padding: 20px; }
-    input, textarea, button, select { width: 100%; margin: 10px 0; padding: 8px; }
-    textarea { height: 200px; }
-
-    #industryButtons button {
-      width: 48%;
-      margin: 5px 1%;
-      cursor: pointer;
+    /* --- Original Claude styles restored --- */
+    * {margin:0;padding:0;box-sizing:border-box;}
+    :root {
+      --primary:#0066CC;
+      --primary-dark:#004C99;
+      --primary-light:#E6F2FF;
+      --accent:#00CC88;
+      --text-dark:#1a1a1a;
+      --text-medium:#4a4a4a;
+      --text-light:#6a6a6a;
+      --bg-white:#ffffff;
+      --bg-gray:#f8f9fa;
+      --border:#e0e0e0;
+      --shadow-sm:0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg:0 8px 24px rgba(0,0,0,0.12);
     }
-
-    #industryButtons {
-      display: flex;
-      flex-wrap: wrap;
-    }
-
-    .activeIndustry {
-      background-color: #0073e6;
-      color: white;
-    }
+    body{font-family:'Karla',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f8f9fa 0%,#e8eef3 100%);color:var(--text-dark);line-height:1.6;min-height:100vh;padding:20px;}
+    #root{max-width:1000px;margin:0 auto;}
+    .header{text-align:center;padding:40px 20px;margin-bottom:40px;background:var(--bg-white);border-radius:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+    .header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary) 0%,var(--accent) 100%);}
+    .header h1{font-size:2.2rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;letter-spacing:-0.02em;}
+    .header p{font-size:1.1rem;color:var(--text-medium);max-width:600px;margin:0 auto;}
+    .badge{display:inline-block;background:var(--primary-light);color:var(--primary-dark);padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:500;margin-top:16px;}
+    .wizard-container{background:var(--bg-white);border-radius:16px;box-shadow:var(--shadow-md);overflow:hidden;}
+    .progress-bar{display:flex;background:var(--bg-gray);padding:24px;gap:16px;}
+    .progress-step{flex:1;text-align:center;position:relative;padding:12px;border-radius:8px;transition:all 0.3s ease;}
+    .progress-step.active{background:var(--primary-light);}
+    .progress-step.completed{background:linear-gradient(135deg,var(--accent) 0%,#00AA70 100%);color:white;}
+    .step-number{width:32px;height:32px;border-radius:50%;background:var(--border);color:var(--text-medium);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:600;font-size:0.9rem;transition:all 0.3s ease;}
+    .progress-step.active .step-number{background:var(--primary);color:white;transform:scale(1.1);}
+    .progress-step.completed .step-number{background:white;color:var(--accent);}
+    .step-label{font-size:0.85rem;font-weight:500;color:var(--text-medium);}
+    .progress-step.active .step-label{color:var(--primary-dark);font-weight:600;}
+    .progress-step.completed .step-label{color:white;}
+    .wizard-content{padding:40px;}
+    .form-section{animation:slideIn 0.4s ease-out;}
+    @keyframes slideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .section-title{font-size:1.5rem;font-weight:700;color:var(--text-dark);margin-bottom:8px;}
+    .section-description{color:var(--text-medium);margin-bottom:32px;font-size:0.95rem;}
+    .form-group{margin-bottom:24px;}
+    label{display:block;font-weight:500;color:var(--text-dark);margin-bottom:8px;font-size:0.95rem;}
+    .label-helper{font-weight:400;color:var(--text-light);font-size:0.85rem;margin-left:4px;}
+    input[type="text"], input[type="email"], select, textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;transition:all 0.2s ease;background:var(--bg-white);}
+    input:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
+    textarea{min-height:100px;resize:vertical;}
+    .department-list{margin-top:16px;}
+    .department-item{display:flex;gap:12px;margin-bottom:12px;align-items:center;}
+    .department-item input{margin-bottom:0;}
+    .department-card{border:2px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;background:var(--bg-white);}
+    .department-header{display:flex;gap:12px;margin-bottom:12px;align-items:center;}
+    .submenu-section{margin-top:16px;padding-top:16px;border-top:2px dashed var(--border);}
+    .submenu-item{display:flex;gap:12px;margin-bottom:8px;align-items:center;padding-left:24px;}
+    .submenu-label{font-size:0.9rem;font-weight:600;color:var(--text-medium);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .toggle-switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+    .switch{position:relative;width:48px;height:24px;background:var(--border);border-radius:12px;transition:background 0.3s ease;}
+    .switch.active{background:var(--primary);}
+    .switch-slider{position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.3s ease;}
+    .switch.active .switch-slider{transform:translateX(24px);}
+    .after-hours-section{background:var(--bg-gray);border-radius:12px;padding:20px;margin-top:24px;}
+    .btn{padding:12px 24px;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s ease;font-family:inherit;display:inline-flex;align-items:center;gap:8px;}
+    .btn-primary{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);color:white;box-shadow:var(--shadow-sm);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+    .btn-secondary{background:var(--bg-gray);color:var(--text-dark);}
+    .btn-secondary:hover{background:var(--border);}
+    .btn-small{padding:8px 16px;font-size:0.9rem;}
+    .btn-danger{background:#dc3545;color:white;}
+    .btn-danger:hover{background:#c82333;}
+    .btn-success{background:linear-gradient(135deg,var(--accent) 0%,#00AA70 100%);color:white;}
+    .wizard-actions{display:flex;justify-content:space-between;margin-top:40px;padding-top:24px;border-top:2px solid var(--bg-gray);}
+    .script-preview{background:var(--bg-gray);border:2px solid var(--border);border-radius:12px;padding:24px;margin:24px 0;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;line-height:1.8;white-space:pre-wrap;position:relative;}
+    .script-preview::before{content:'📝 Generated Script';display:block;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--primary);margin-bottom:16px;font-size:0.9rem;}
+    .editable-script{width:100%;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;line-height:1.8;border:none;background:transparent;resize:vertical;min-height:300px;}
+    .script-stats{display:flex;gap:24px;margin-top:16px;padding:16px;background:var(--bg-white);border-radius:8px;}
+    .stat{flex:1;text-align:center;}
+    .stat-value{font-size:1.5rem;font-weight:700;color:var(--primary);font-family:'IBM Plex Mono',monospace;}
+    .stat-label{font-size:0.85rem;color:var(--text-medium);margin-top:4px;}
+    .voice-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
+    .voice-card{border:2px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s ease;text-align:center;position:relative;}
+    .voice-card:hover{border-color:var(--primary);transform:translateY(-4px);box-shadow:var(--shadow-md);}
+    .voice-card.selected{border-color:var(--primary);background:var(--primary-light);}
+    .voice-card.coming-soon{opacity:0.6;cursor:not-allowed;}
+    .voice-card.coming-soon:hover{transform:none;box-shadow:none;}
+    .voice-icon{font-size:2.5rem;margin-bottom:12px;}
+    .voice-name{font-weight:600;color:var(--text-dark);margin-bottom:4px;}
+    .voice-description{font-size:0.85rem;color:var(--text-medium);}
+    .coming-soon-badge{display:inline-block;background:var(--accent);color:white;padding:4px 12px;border-radius:12px;font-size:0.75rem;font-weight:600;margin-top:8px;}
+    .export-section{text-align:center;padding:40px;}
+    .export-icon{font-size:4rem;margin-bottom:24px;animation:bounce 2s ease-in-out infinite;}
+    @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .export-buttons{display:flex;gap:16px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
+    .email-capture{max-width:500px;margin:32px auto;padding:24px;background:var(--bg-gray);}
+    .email-capture h3{font-size:1.2rem;margin-bottom:8px;color:var(--text-dark);}
+    .email-capture p{font-size:0.9rem;color:var(--text-medium);margin-bottom:16px;}
+    .email-input-group{display:flex;gap:12px;}
+    .email-input-group input{flex:1;}
+    .feature-coming-soon{background:linear-gradient(135deg,var(--primary-light) 0%,#E6F9F3 100%);border:2px dashed var(--primary);border-radius:12px;padding:32px;text-align:center;margin:24px 0;}
+    .feature-coming-soon h3{color:var(--primary-dark);margin-bottom:12px;font-size:1.3rem;}
+    .feature-coming-soon p{color:var(--text-medium);margin-bottom:20px;}
+    .industry-templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+    .template-btn{padding:12px;border:2px solid var(--border);border-radius:8px;background:var(--bg-white);cursor:pointer;transition:all 0.2s ease;font-size:0.9rem;font-weight:500;}
+    .template-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+    .template-btn.active{border-color:var(--primary);background:var(--primary);color:white;}
+    .tone-selector{display:flex;gap:12px;margin-bottom:24px;}
+    .tone-btn{flex:1;padding:12px;border:2px solid var(--border);border-radius:8px;background:var(--bg-white);cursor:pointer;transition:all 0.2s ease;text-align:center;}
+    .tone-btn:hover{border-color:var(--primary);}
+    .tone-btn.active{border-color:var(--primary);background:var(--primary-light);}
+    .footer{text-align:center;padding:32px 20px;margin-top:40px;color:var(--text-medium);font-size:0.9rem;}
+    .footer a{color:var(--primary);text-decoration:none;font-weight:500;}
+    .footer a:hover{text-decoration:underline;}
+    @media (max-width:768px){.header h1{font-size:1.6rem;}.wizard-content{padding:24px;}.progress-bar{padding:16px;}.step-label{display:none;}.export-buttons{flex-direction:column;}}
   </style>
 </head>
 <body>
+  <div id="root"></div>
 
-<h2>Business Automated Receptionist Generator</h2>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-<h3>Select Industry</h3>
-<div id="industryButtons">
-  <button onclick="setIndustry('medical', this)">🏥 Healthcare</button>
-  <button onclick="setIndustry('law', this)">⚖️ Law Firm</button>
-  <button onclick="setIndustry('automotive', this)">🚗 Automotive</button>
-  <button onclick="setIndustry('realestate', this)">🏠 Real Estate</button>
-  <button onclick="setIndustry('restaurant', this)">🍽️ Restaurant</button>
-  <button onclick="setIndustry('contractor', this)">🔧 Contractor</button>
-  <button onclick="setIndustry('finance', this)">💼 Finance</button>
-  <button onclick="setIndustry('retail', this)">🛍️ Retail</button>
-  <button onclick="setIndustry('generic', this)">🏢 Generic</button>
-</div>
+    // --- INDUSTRY CONFIGURATION WITH CUSTOM GREETINGS & AFTER-HOURS ---
+    const industryTemplates = {
+      general: { name:'General Business', emoji:'🏢', greeting:'Thank you for calling', afterHours:'Our office hours are Monday through Friday, 9 AM to 5 PM.' },
+      medical: { name:'Healthcare', emoji:'🏥', greeting:'Thank you for contacting', afterHours:'Our office hours are Monday through Friday, 8 AM to 6 PM.' },
+      retail: { name:'Retail', emoji:'🛍️', greeting:'Welcome and thank you for calling', afterHours:'Our store hours are Monday through Saturday, 10 AM to 8 PM.' },
+      professional: { name:'Professional Services', emoji:'💼', greeting:'Thank you for calling', afterHours:'Our office hours are Monday through Friday, 9 AM to 6 PM.' },
+      restaurant: { name:'Restaurant', emoji:'🍽️', greeting:'Hello and thank you for calling', afterHours:'Our restaurant hours are Monday through Sunday, 11 AM to 10 PM.' },
+      automotive: { name:'Automotive', emoji:'🚗', greeting:'Thank you for calling', afterHours:'To schedule service or inquire about vehicle availability, please choose from the options below.' }
+    };
 
-<label>Business Name</label>
-<input id="businessName" placeholder="Office Communications">
+    const tones = {
+      professional: { name:'Professional', emoji:'👔' },
+      friendly: { name:'Friendly', emoji:'😊' },
+      efficient: { name:'Efficient', emoji:'⚡' }
+    };
 
-<label>Business Hours</label>
-<input id="hours" placeholder="Monday through Friday, 9 AM to 5 PM">
+    const voiceOptions = [
+      { id:'female-warm', name:'Professional Female', description:'Warm & approachable', icon:'👩‍💼', comingSoon:true },
+      { id:'male-clear', name:'Professional Male', description:'Clear & authoritative', icon:'👨‍💼', comingSoon:true },
+      { id:'neutral', name:'Neutral Voice', description:'Modern & inclusive', icon:'🎙️', comingSoon:true }
+    ];
 
-<label>After Hours?</label>
-<select id="afterHours">
-  <option value="no">No</option>
-  <option value="yes">Yes</option>
-</select>
+    function AutoAttendantBuilder(){
+      const [currentStep,setCurrentStep] = useState(1);
+      const [formData,setFormData] = useState({
+        businessName:'', industry:'general', tone:'professional', hours:'',
+        departments:[
+          {name:'Sales', extension:'1', hasSubmenu:false, submenuOptions:[]},
+          {name:'Support', extension:'2', hasSubmenu:false, submenuOptions:[]}
+        ],
+        specialInstructions:'', enableAfterHours:false, afterHoursMessage:'', email:''
+      });
+      const [generatedScript,setGeneratedScript] = useState('');
+      const [selectedVoice,setSelectedVoice] = useState('female-warm');
+      const [completedSteps,setCompletedSteps] = useState([]);
 
-<label>Custom Message (Optional)</label>
-<input id="customMessage" placeholder="Leave blank to auto-fill by industry">
+      const steps=[
+        {number:1,label:'Business Info'},
+        {number:2,label:'Routing'},
+        {number:3,label:'Review Script'},
+        {number:4,label:'Voice & Export'}
+      ];
 
-<button onclick="generateGreeting()">Generate Greeting</button>
+      const updateFormData=(field,value)=>{setFormData(prev=>({...prev,[field]:value}));};
+      const addDepartment=()=>{setFormData(prev=>({...prev,departments:[...prev.departments,{name:'',extension:'',hasSubmenu:false,submenuOptions:[]}]}));};
+      const removeDepartment=index=>{setFormData(prev=>({...prev,departments:prev.departments.filter((_,i)=>i!==index)}));};
+      const updateDepartment=(index,field,value)=>{setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===index?{...d,[field]:value}:d)}));};
 
-<label>Generated Script</label>
-<textarea id="output"></textarea>
+      const toggleSubmenu=deptIndex=>{
+        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,hasSubmenu:!d.hasSubmenu,submenuOptions:!d.hasSubmenu?[{name:'',extension:''}]:[]}:d)}));
+      };
+      const updateSubmenu=(deptIndex,subIndex,field,value)=>{
+        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>{
+          if(i!==deptIndex) return d;
+          const newSub=d.submenuOptions.map((s,j)=>j===subIndex?{...s,[field]:value}:s);
+          return {...d,submenuOptions:newSub};
+        })}));
+      };
+      const addSubmenuOption=deptIndex=>{
+        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,submenuOptions:[...d.submenuOptions,{name:'',extension:''}]}:d)}));
+      };
+      const removeSubmenuOption=(deptIndex,subIndex)=>{
+        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,submenuOptions:d.submenuOptions.filter((_,j)=>j!==subIndex)}:d)}));
+      };
 
-<button onclick="sendToZapier()">Send to Zapier</button>
+      useEffect(()=>{
+        const industryData = industryTemplates[formData.industry] || industryTemplates['general'];
+        const header = `${industryData.greeting} ${formData.businessName || ''}.`;
+        let script = header + '\n\n';
+        formData.departments.forEach(d=>{
+          script+=`Press ${d.extension} for ${d.name}.\n`;
+          if(d.hasSubmenu){
+            d.submenuOptions.forEach(s=>{
+              script+=`   Press ${s.extension} for ${s.name}.\n`;
+            });
+          }
+        });
+        if(formData.enableAfterHours){
+          script+='\n'+(industryData.afterHours||formData.afterHoursMessage);
+        }
+        setGeneratedScript(script);
+      },[formData]);
 
-<script>
+      const handleEmailSubmit=()=>{ 
+        // Placeholder for webhook
+        fetch('YOUR_ZAPIER_WEBHOOK_URL',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email:formData.email,script:generatedScript,cc:'onetalk@officecommunications.net'})
+        }).then(r=>alert('Email sent!')).catch(e=>alert('Error sending email.'));
+      };
 
-let selectedIndustry = "generic";
+      return <div className="wizard-container">
+        <div className="header">
+          <h1>One Talk Auto Receptionist Builder</h1>
+          <p>Generate your business’s automated attendant script in minutes and export it as a shareable file.</p>
+          <span className="badge">🚀 Quick Setup</span>
+        </div>
 
-function setIndustry(industry, buttonElement) {
-  selectedIndustry = industry;
+        <div className="progress-bar">
+          {steps.map(step=>{
+            const isActive=currentStep===step.number;
+            const isCompleted=currentStep>step.number;
+            return <div key={step.number} className={`progress-step ${isActive?'active':''} ${isCompleted?'completed':''}`}>
+              <div className="step-number">{step.number}</div>
+              <div className="step-label">{step.label}</div>
+            </div>;
+          })}
+        </div>
 
-  // Remove active class from all buttons
-  const buttons = document.querySelectorAll("#industryButtons button");
-  buttons.forEach(btn => btn.classList.remove("activeIndustry"));
+        <div className="wizard-content form-section">
+          {currentStep===1 && <>
+            <div className="form-group">
+              <label>Business Name</label>
+              <input type="text" value={formData.businessName} onChange={e=>updateFormData('businessName',e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Industry</label>
+              <div className="industry-templates">
+                {Object.entries(industryTemplates).map(([key,data])=>
+                  <button key={key} className={`template-btn ${formData.industry===key?'active':''}`} onClick={()=>updateFormData('industry',key)}>
+                    {data.emoji} {data.name}
+                  </button>
+                )}
+              </div>
+            </div>
+          </>}
 
-  // Add active class to selected
-  buttonElement.classList.add("activeIndustry");
-}
+          {currentStep===2 && <>
+            {formData.departments.map((d,i)=><div key={i} className="department-card">
+              <div className="department-header">
+                <input type="text" placeholder="Department Name" value={d.name} onChange={e=>updateDepartment(i,'name',e.target.value)} />
+                <input type="text" placeholder="Extension" value={d.extension} onChange={e=>updateDepartment(i,'extension',e.target.value)} />
+                <button className="btn btn-danger btn-small" onClick={()=>removeDepartment(i)}>Delete</button>
+              </div>
+              <div className="toggle-switch" onClick={()=>toggleSubmenu(i)}>
+                <div className={`switch ${d.hasSubmenu?'active':''}`}><div className="switch-slider"></div></div>
+                <span>Add Submenu</span>
+              </div>
+              {d.hasSubmenu && <div className="submenu-section">
+                {d.submenuOptions.map((s,j)=><div key={j} className="submenu-item">
+                  <input type="text" placeholder="Option Name" value={s.name} onChange={e=>updateSubmenu(i,j,'name',e.target.value)} />
+                  <input type="text" placeholder="Extension" value={s.extension} onChange={e=>updateSubmenu(i,j,'extension',e.target.value)} />
+                  <button className="btn btn-danger btn-small" onClick={()=>removeSubmenuOption(i,j)}>Delete</button>
+                </div>)}
+                {d.submenuOptions.length<1 && <button className="btn btn-secondary btn-small" onClick={()=>addSubmenuOption(i)}>Add Option</button>}
+              </div>}
+            </div>)}
+            <button className="btn btn-primary" onClick={addDepartment}>+ Add Department</button>
 
-function generateGreeting() {
+            <div className="form-group after-hours-section">
+              <div className="toggle-switch" onClick={()=>updateFormData('enableAfterHours',!formData.enableAfterHours)}>
+                <div className={`switch ${formData.enableAfterHours?'active':''}`}><div className="switch-slider"></div></div>
+                <span>Enable After-Hours Message</span>
+              </div>
+              {formData.enableAfterHours && <textarea placeholder="After-hours message (optional, overrides default)" value={formData.afterHoursMessage} onChange={e=>updateFormData('afterHoursMessage',e.target.value)} />}
+            </div>
+          </>}
 
-  const name = document.getElementById("businessName").value;
-  const hours = document.getElementById("hours").value;
-  const afterHours = document.getElementById("afterHours").value;
-  let custom = document.getElementById("customMessage").value;
+          {currentStep===3 && <>
+            <div className="script-preview"><textarea className="editable-script" value={generatedScript} onChange={e=>setGeneratedScript(e.target.value)} /></div>
+            <div className="email-capture">
+              <h3>Send Script via Email</h3>
+              <p>Enter your email to receive the generated script (CC: onetalk@officecommunications.net)</p>
+              <div className="email-input-group">
+                <input type="email" placeholder="you@example.com" value={formData.email} onChange={e=>updateFormData('email',e.target.value)} />
+                <button className="btn btn-success" onClick={handleEmailSubmit}>Send</button>
+              </div>
+            </div>
+          </>}
 
-  const industryData = {
+          {currentStep===4 && <>
+            <div className="voice-options">
+              {voiceOptions.map(v=><div key={v.id} className={`voice-card ${selectedVoice===v.id?'selected':''} ${v.comingSoon?'coming-soon':''}`} onClick={()=>!v.comingSoon&&setSelectedVoice(v.id)}>
+                <div className="voice-icon">{v.icon}</div>
+                <div className="voice-name">{v.name}</div>
+                <div className="voice-description">{v.description}</div>
+                {v.comingSoon && <div className="coming-soon-badge">Coming Soon</div>}
+              </div>)}
+            </div>
+            <div className="export-section">
+              <div className="export-icon">📤</div>
+              <div className="export-buttons">
+                <button className="btn btn-primary" onClick={()=>{
+                  const doc = new jspdf.jsPDF();
+                  doc.text(generatedScript,10,10);
+                  doc.save(`${formData.businessName||'script'}.pdf`);
+                }}>Export PDF</button>
+              </div>
+            </div>
+          </>}
+        </div>
 
-    generic: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "Please choose from the following options.",
-      options: "Press 1 for Sales.\nPress 2 for Support.\nPress 0 for the Operator.",
-      afterHours: "Our office is currently closed. Please leave a message and we will return your call as soon as possible."
-    },
-
-    automotive: {
-      greeting: `Thank you for calling ${name}, your trusted automotive service and sales provider.`,
-      prompt: "To schedule service or inquire about vehicle availability, choose from the options below.",
-      options: "Press 1 for Service.\nPress 2 for Sales.\nPress 3 for Parts.\nPress 0 for Reception.",
-      afterHours: "Our dealership is currently closed. To schedule service online, please visit our website. Otherwise, leave a message and our team will return your call on the next business day."
-    },
-
-    medical: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "For patient care and scheduling, please select from the following options.",
-      options: "Press 1 to schedule or manage an appointment.\nPress 2 for billing questions.\nPress 3 for prescription refills.\nIf this is a medical emergency, please hang up and dial 911.",
-      afterHours: "Our office is currently closed. If this is a medical emergency, hang up and dial 911. Otherwise, leave a message and our staff will return your call."
-    },
-
-    law: {
-      greeting: `Thank you for calling ${name}, Attorneys at Law.`,
-      prompt: "Please select from the following options.",
-      options: "Press 1 for new client intake.\nPress 2 for an existing case.\nPress 3 for billing.\nPress 0 for the receptionist.",
-      afterHours: "Our office is currently closed. Please leave a detailed message and an attorney or staff member will return your call as soon as possible."
-    },
-
-    realestate: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "To speak with an agent or inquire about a listing, please choose an option.",
-      options: "Press 1 for residential sales.\nPress 2 for commercial properties.\nPress 3 for property management.\nPress 0 for the front desk.",
-      afterHours: "Our office is currently closed. To view listings, visit our website. Leave a message and an agent will contact you shortly."
-    },
-
-    restaurant: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "For reservations or ordering, please select an option.",
-      options: "Press 1 for reservations.\nPress 2 for takeout or catering.\nPress 3 for hours and location.\nPress 0 to speak with the host.",
-      afterHours: "We are currently closed. Please visit our website for hours and menu information. We look forward to serving you soon."
-    },
-
-    contractor: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "For service requests or project estimates, please choose from the following options.",
-      options: "Press 1 to request service.\nPress 2 for a new project estimate.\nPress 3 for billing.\nPress 0 for the office.",
-      afterHours: "Our office is currently closed. Please leave a message describing your service needs and we will contact you the next business day."
-    },
-
-    finance: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "For account assistance or policy information, please choose from the following options.",
-      options: "Press 1 for account support.\nPress 2 for new policies or services.\nPress 3 for billing.\nPress 0 for reception.",
-      afterHours: "Our office is currently closed. If you need immediate assistance, please visit your online account portal. Otherwise, leave a message."
-    },
-
-    retail: {
-      greeting: `Thank you for calling ${name}.`,
-      prompt: "For store information or customer support, please choose an option.",
-      options: "Press 1 for store hours and location.\nPress 2 for order status.\nPress 3 for returns and exchanges.\nPress 0 to speak with a team member.",
-      afterHours: "Our store is currently closed. Please visit our website for store hours and online ordering. We will return your call soon."
+        <div className="wizard-actions">
+          <button className="btn btn-secondary" onClick={()=>setCurrentStep(prev=>Math.max(prev-1,1))}>Back</button>
+          <button className="btn btn-primary" onClick={()=>setCurrentStep(prev=>Math.min(prev+1,steps.length))}>Next</button>
+        </div>
+      </div>;
     }
 
-  };
-
-  const selected = industryData[selectedIndustry];
-
-  if (!custom) {
-    custom = selected.prompt;
-  }
-
-  let script = selected.greeting + "\n\n";
-
-  if (afterHours === "yes") {
-    script += selected.afterHours;
-  } else {
-    script += custom + "\n\n" + selected.options + "\n\nOur business hours are " + hours + ".";
-  }
-
-  document.getElementById("output").value = script;
-}
-
-function sendToZapier() {
-
-  const webhookURL = "https://hooks.zapier.com/hooks/catch/2630762/uc1zyf1/";
-
-  const payload = {
-    businessName: document.getElementById("businessName").value,
-    industry: selectedIndustry,
-    hours: document.getElementById("hours").value,
-    afterHours: document.getElementById("afterHours").value,
-    script: document.getElementById("output").value
-  };
-
-  fetch(webhookURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(response => alert("Sent to Zapier successfully!"))
-  .catch(error => alert("Error sending to Zapier"));
-}
-
-</script>
-
+    ReactDOM.render(<AutoAttendantBuilder />,document.getElementById('root'));
+  </script>
 </body>
 </html>
-
