@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Business Auto Attendant Generator</title>
+  <title>Business Automated Receptionist Generator</title>
   <meta charset="UTF-8">
   <style>
-    body { font-family: Arial; max-width: 800px; margin: auto; padding: 20px; }
-    select, input, textarea, button { width: 100%; margin: 10px 0; padding: 8px; }
-    textarea { height: 180px; }
+    body { font-family: Karla; max-width: 850px; margin: auto; padding: 20px; }
+    input, textarea, button, select { width: 100%; margin: 10px 0; padding: 8px; }
+    textarea { height: 200px; }
+
+    #industryButtons button {
+      width: 48%;
+      margin: 5px 1%;
+      cursor: pointer;
+    }
+
+    #industryButtons {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .activeIndustry {
+      background-color: #0073e6;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
-<h2>Business Auto Attendant Generator</h2>
+<h2>Business Automated Receptionist Generator</h2>
+
+<h3>Select Industry</h3>
+<div id="industryButtons">
+  <button onclick="setIndustry('medical', this)">🏥 Healthcare</button>
+  <button onclick="setIndustry('law', this)">⚖️ Law Firm</button>
+  <button onclick="setIndustry('automotive', this)">🚗 Automotive</button>
+  <button onclick="setIndustry('realestate', this)">🏠 Real Estate</button>
+  <button onclick="setIndustry('restaurant', this)">🍽️ Restaurant</button>
+  <button onclick="setIndustry('contractor', this)">🔧 Contractor</button>
+  <button onclick="setIndustry('finance', this)">💼 Finance</button>
+  <button onclick="setIndustry('retail', this)">🛍️ Retail</button>
+  <button onclick="setIndustry('generic', this)">🏢 Generic</button>
+</div>
 
 <label>Business Name</label>
 <input id="businessName" placeholder="Office Communications">
-
-<label>Industry</label>
-<select id="industry">
-  <option value="generic">Generic</option>
-  <option value="automotive">Automotive</option>
-  <option value="medical">Medical</option>
-  <option value="law">Law Firm</option>
-  <option value="realestate">Real Estate</option>
-  <option value="restaurant">Restaurant</option>
-  <option value="contractor">Home Services / Contractor</option>
-  <option value="finance">Finance / Insurance</option>
-  <option value="retail">Retail</option>
-</select>
 
 <label>Business Hours</label>
 <input id="hours" placeholder="Monday through Friday, 9 AM to 5 PM">
@@ -50,17 +66,25 @@
 
 <script>
 
+let selectedIndustry = "generic";
+
+function setIndustry(industry, buttonElement) {
+  selectedIndustry = industry;
+
+  // Remove active class from all buttons
+  const buttons = document.querySelectorAll("#industryButtons button");
+  buttons.forEach(btn => btn.classList.remove("activeIndustry"));
+
+  // Add active class to selected
+  buttonElement.classList.add("activeIndustry");
+}
+
 function generateGreeting() {
 
   const name = document.getElementById("businessName").value;
-  const industry = document.getElementById("industry").value;
   const hours = document.getElementById("hours").value;
   const afterHours = document.getElementById("afterHours").value;
   let custom = document.getElementById("customMessage").value;
-
-  // -------------------------
-  // INDUSTRY SETTINGS
-  // -------------------------
 
   const industryData = {
 
@@ -129,7 +153,7 @@ function generateGreeting() {
 
   };
 
-  const selected = industryData[industry];
+  const selected = industryData[selectedIndustry];
 
   if (!custom) {
     custom = selected.prompt;
@@ -148,11 +172,11 @@ function generateGreeting() {
 
 function sendToZapier() {
 
-  const webhookURL = "https://hooks.zapier.com/hooks/catch/2630762/uc1zyf1";
+  const webhookURL = "https://hooks.zapier.com/hooks/catch/2630762/uc1zyf1/";
 
   const payload = {
     businessName: document.getElementById("businessName").value,
-    industry: document.getElementById("industry").value,
+    industry: selectedIndustry,
     hours: document.getElementById("hours").value,
     afterHours: document.getElementById("afterHours").value,
     script: document.getElementById("output").value
