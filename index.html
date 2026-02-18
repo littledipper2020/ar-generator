@@ -39,7 +39,6 @@
   input, textarea, select, button { font-family: inherit; }
   textarea { resize: vertical; }
 
-  /* ── LAYOUT ── */
   .app { max-width: 880px; margin: 0 auto; padding: 0 20px 40px; }
 
   /* ── HEADER ── */
@@ -58,14 +57,13 @@
   .progress-step { flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-lg); background: transparent; border: none; color: var(--text); text-align: left; transition: all 0.2s; cursor: default; opacity: 0.4; min-width: 0; }
   .progress-step.active { background: var(--surface-2); opacity: 1; cursor: pointer; }
   .progress-step.done { background: var(--green-soft); opacity: 1; cursor: pointer; }
-  .progress-step.clickable { cursor: pointer; }
   .step-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; transition: all 0.2s; }
   .progress-step.active .step-circle { border-color: var(--red); color: var(--red); }
   .progress-step.done .step-circle { border-color: var(--green); background: var(--green); color: #000; }
   .step-label { font-weight: 600; font-size: 13px; white-space: nowrap; }
   .step-sub { font-size: 11px; color: var(--text-mute); white-space: nowrap; }
 
-  /* ── CONTENT PANEL ── */
+  /* ── CONTENT ── */
   .content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-3xl); padding: 32px 28px; }
   .section-head { margin-bottom: 28px; }
   .section-head h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
@@ -101,13 +99,30 @@
   .dept-header .col-key { width: 70px; text-align: center; }
   .dept-header .col-ring { width: 150px; }
   .dept-header .col-del { width: 34px; }
-  .dept-row { display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-lg); margin-bottom: 8px; animation: fadeIn 0.25s ease; }
+
+  .dept-block { margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.25s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  .dept-row .input-name { flex: 2; }
-  .dept-row .input-key { width: 70px; text-align: center; font-family: var(--mono); font-weight: 700; }
-  .dept-row .input-ring { width: 150px; }
+  .dept-main { display: flex; gap: 10px; align-items: center; padding: 8px 10px; }
+  .dept-main .input-name { flex: 2; }
+  .dept-main .input-key { width: 70px; text-align: center; font-family: var(--mono); font-weight: 700; }
+  .dept-main .input-ring { width: 150px; }
   .remove-btn { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: var(--text-mute); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
   .remove-btn:hover { background: rgba(238,0,0,0.15); color: var(--red); }
+
+  /* ── SUBMENUS ── */
+  .submenu-area { padding: 0 10px 10px 10px; border-top: 1px dashed var(--border-2); margin-top: 0; }
+  .submenu-label { font-size: 11px; font-weight: 600; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 0 6px 28px; display: flex; align-items: center; gap: 6px; }
+  .submenu-row { display: flex; gap: 8px; align-items: center; padding: 4px 0 4px 28px; }
+  .submenu-row .input-sub-name { flex: 2; font-size: 13px; padding: 7px 12px; }
+  .submenu-row .input-sub-key { width: 60px; text-align: center; font-family: var(--mono); font-weight: 700; font-size: 13px; padding: 7px 8px; }
+  .sub-remove { width: 28px; height: 28px; border-radius: 50%; border: none; background: transparent; color: var(--text-mute); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sub-remove:hover { color: var(--red); }
+  .sub-add-btn { margin: 6px 0 4px 28px; padding: 5px 14px; background: transparent; border: 1px dashed var(--border-2); border-radius: 6px; color: var(--text-mute); cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; }
+  .sub-add-btn:hover { border-color: var(--text-mute); color: var(--text-dim); }
+  .submenu-toggle { padding: 5px 12px; background: transparent; border: 1px solid var(--border-2); border-radius: 6px; color: var(--text-mute); cursor: pointer; font-size: 11px; font-weight: 600; margin-left: 28px; margin-top: 8px; margin-bottom: 6px; transition: all 0.15s; }
+  .submenu-toggle:hover { border-color: var(--text-mute); color: var(--text-dim); }
+  .submenu-toggle.active { border-color: var(--red-border); color: var(--red-3); background: var(--red-soft); }
+
   .add-btn { margin-top: 4px; padding: 8px 18px; background: transparent; border: 1px dashed var(--border-2); border-radius: var(--radius); color: var(--text-dim); cursor: pointer; font-size: 13px; font-weight: 600; width: 100%; transition: all 0.15s; }
   .add-btn:hover { border-color: var(--text-mute); color: var(--text); }
 
@@ -116,7 +131,7 @@
   .check-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-mid); cursor: pointer; margin-bottom: 22px; }
   .check-label input { width: 18px; height: 18px; accent-color: var(--red); cursor: pointer; }
 
-  /* ── AFTER HOURS / BOXES ── */
+  /* ── AFTER HOURS ── */
   .ah-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); margin-bottom: 22px; }
   .ah-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .toggle { width: 48px; height: 26px; border-radius: 13px; border: none; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
@@ -165,15 +180,13 @@
   .footer { text-align: center; padding: 32px 0 8px; color: var(--text-mute); font-size: 13px; }
   .footer .red { color: var(--red-3); }
 
-  /* ── STEP VISIBILITY ── */
   .step-panel { display: none; }
   .step-panel.visible { display: block; animation: fadeIn 0.35s ease; }
 
-  /* ── RESPONSIVE ── */
   @media (max-width: 640px) {
     .header h1 { font-size: 22px; }
     .content { padding: 24px 18px; }
-    .dept-header .col-ring, .dept-row .input-ring { display: none; }
+    .dept-header .col-ring, .dept-main .input-ring { display: none; }
     .step-sub { display: none; }
     .progress-step { padding: 8px 10px; }
   }
@@ -187,9 +200,7 @@
     <div class="header-top">
       <div class="logo-row">
         <div class="logo-mark">OT</div>
-        <div>
-          <div class="logo-text">One Talk <span class="logo-sub">Auto Receptionist</span></div>
-        </div>
+        <div><div class="logo-text">One Talk <span class="logo-sub">Auto Receptionist</span></div></div>
       </div>
       <div class="badge">PHASE 1 — SCRIPT GENERATOR</div>
     </div>
@@ -197,10 +208,8 @@
     <p>Build professional auto-attendant scripts for Verizon One Talk in minutes. Choose an industry template, customize departments, and generate a ready-to-use script.</p>
   </header>
 
-  <!-- PROGRESS BAR -->
   <div class="progress-bar" id="progressBar"></div>
 
-  <!-- CONTENT -->
   <div class="content">
 
     <!-- ═══ STEP 1 ═══ -->
@@ -209,23 +218,19 @@
         <h2>Business Information</h2>
         <p>Start with the basics — we'll use this to build your custom script.</p>
       </div>
-
       <div class="field">
         <label class="field-label">Business Name <span class="req">*</span></label>
         <input type="text" class="input" id="businessName" placeholder="e.g. Acme Dental Group">
       </div>
-
       <div class="field">
         <label class="field-label">Industry Template</label>
-        <p class="field-hint">Select your industry to pre-fill departments and messaging.</p>
+        <p class="field-hint">Select your industry to customize your script.</p>
         <div class="industry-grid" id="industryGrid"></div>
       </div>
-
       <div class="field">
         <label class="field-label">Greeting Tone</label>
         <div class="tone-row" id="toneRow"></div>
       </div>
-
       <div class="field">
         <label class="field-label">Business Hours <span class="hint">(optional)</span></label>
         <input type="text" class="input" id="businessHours" placeholder="e.g. Monday – Friday, 9:00 AM – 5:00 PM" value="Monday – Friday, 9:00 AM – 5:00 PM">
@@ -236,9 +241,8 @@
     <div class="step-panel" id="step2">
       <div class="section-head">
         <h2>Call Routing & Departments</h2>
-        <p>Configure your phone menu. Each department maps to an extension key press in One Talk.</p>
+        <p>Configure your phone menu. Each department maps to an extension key press in One Talk. Optionally add sub-menu options within each department.</p>
       </div>
-
       <div class="dept-header">
         <span class="col-name">Department</span>
         <span class="col-key">Key</span>
@@ -261,7 +265,6 @@
       </div>
 
       <div class="sep"></div>
-
       <div class="ah-box">
         <div class="ah-top">
           <div>
@@ -276,7 +279,6 @@
           <textarea class="input" id="afterHoursMsg" rows="3" placeholder="" style="min-height:80px; margin-top:8px;"></textarea>
         </div>
       </div>
-
       <div class="field">
         <label class="field-label">Special Instructions <span class="hint">(optional)</span></label>
         <textarea class="input" id="specialInstructions" rows="3" placeholder="e.g. If you know your party's extension, you may dial it at any time." style="min-height:80px;"></textarea>
@@ -289,18 +291,15 @@
         <h2>Review & Edit Script</h2>
         <p>Your generated script is below. Feel free to edit it directly — changes are preserved.</p>
       </div>
-
       <div class="script-box">
         <div class="script-label">📝 Main Greeting</div>
         <textarea class="script-area" id="mainScript" rows="10"></textarea>
         <div class="script-stats" id="scriptStats"></div>
       </div>
-
       <div class="script-box" id="ahScriptBox" style="margin-top:20px; display:none;">
         <div class="script-label">🌙 After-Hours Greeting</div>
         <textarea class="script-area" id="ahScript" rows="8"></textarea>
       </div>
-
       <div class="config-box">
         <div class="config-label">📋 One Talk Configuration Summary</div>
         <pre class="config-pre" id="configPreview3"></pre>
@@ -314,12 +313,10 @@
         <h2 style="font-size:24px; font-weight:700; margin-bottom:6px;">Your Script is Ready!</h2>
         <p style="color:var(--text-dim); max-width:500px; margin:0 auto;">Copy the script, share it with your team, or send it via email to get started with One Talk.</p>
       </div>
-
       <div class="export-btns">
         <button class="btn-primary" onclick="copyFullScript()" id="copyBtn">📋 Copy Full Script</button>
         <button class="btn-secondary" onclick="copyConfig()">📄 Copy Config Summary</button>
       </div>
-
       <div class="script-box" style="margin-top:24px;">
         <div class="script-label">Main Greeting</div>
         <pre class="final-pre" id="finalMain"></pre>
@@ -328,7 +325,6 @@
         <div class="script-label">After-Hours Greeting</div>
         <pre class="final-pre" id="finalAh"></pre>
       </div>
-
       <div class="config-box">
         <div class="config-label">One Talk Configuration Summary</div>
         <pre class="config-pre" id="configPreview4"></pre>
@@ -344,118 +340,119 @@
         </div>
       </div>
 
-      <!-- Phase 2 Teaser -->
+      <!-- Phase 2 -->
       <div class="phase2">
         <div style="font-size:36px; margin-bottom:8px;">🔊</div>
         <h3>Coming Soon — Phase 2: AI Voice Generation</h3>
         <p>Connect to ElevenLabs to generate professional audio files directly from your script. Choose from dozens of natural-sounding voices and download MP3/WAV files ready to upload to One Talk.</p>
         <div class="voice-grid">
-          <div class="voice-card">
-            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
-            <strong>Rachel</strong>
-            <div style="font-size:12px; color:var(--text-dim);">Warm, professional female</div>
-            <div class="cs-badge">Coming Soon</div>
-          </div>
-          <div class="voice-card">
-            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
-            <strong>Adam</strong>
-            <div style="font-size:12px; color:var(--text-dim);">Clear, authoritative male</div>
-            <div class="cs-badge">Coming Soon</div>
-          </div>
-          <div class="voice-card">
-            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
-            <strong>Bella</strong>
-            <div style="font-size:12px; color:var(--text-dim);">Friendly, approachable female</div>
-            <div class="cs-badge">Coming Soon</div>
-          </div>
+          <div class="voice-card"><div style="font-size:28px; margin-bottom:4px;">🎙️</div><strong>Rachel</strong><div style="font-size:12px; color:var(--text-dim);">Warm, professional female</div><div class="cs-badge">Coming Soon</div></div>
+          <div class="voice-card"><div style="font-size:28px; margin-bottom:4px;">🎙️</div><strong>Adam</strong><div style="font-size:12px; color:var(--text-dim);">Clear, authoritative male</div><div class="cs-badge">Coming Soon</div></div>
+          <div class="voice-card"><div style="font-size:28px; margin-bottom:4px;">🎙️</div><strong>Bella</strong><div style="font-size:12px; color:var(--text-dim);">Friendly, approachable female</div><div class="cs-badge">Coming Soon</div></div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- NAV -->
   <div class="nav-row" id="navRow"></div>
-
   <footer class="footer">Built for Verizon One Talk partners · <span class="red">Office Communications</span></footer>
-
 </div>
 
 <script>
 /* ═══════════════════════════════════════════════════
-   DATA
+   DATA — Industry Templates
    ═══════════════════════════════════════════════════ */
 const templates = {
   general: {
     name: "General Business", icon: "🏢",
     departments: [
-      { name: "Sales", extension: "1", ring: "simultaneous" },
-      { name: "Support", extension: "2", ring: "simultaneous" },
+      { name: "Sales", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Support", extension: "2", ring: "simultaneous", subs: [] },
     ],
     afterHours: "Please leave a message and we will return your call during business hours.",
   },
   medical: {
     name: "Healthcare", icon: "🏥",
     departments: [
-      { name: "Appointments", extension: "1", ring: "simultaneous" },
-      { name: "Billing", extension: "2", ring: "sequential" },
-      { name: "Pharmacy", extension: "3", ring: "sequential" },
-      { name: "Nurse Line", extension: "4", ring: "simultaneous" },
+      { name: "Appointments", extension: "1", ring: "simultaneous", subs: [{ name: "New Patient", key: "1" }, { name: "Existing Patient", key: "2" }] },
+      { name: "Billing", extension: "2", ring: "sequential", subs: [] },
+      { name: "Pharmacy", extension: "3", ring: "sequential", subs: [] },
+      { name: "Nurse Line", extension: "4", ring: "simultaneous", subs: [] },
     ],
     afterHours: "If this is a medical emergency, please hang up and dial 911. For urgent matters, press 9 to reach our on-call provider. Otherwise, please leave a detailed message.",
   },
   legal: {
     name: "Legal / Law Firm", icon: "⚖️",
     departments: [
-      { name: "New Client Intake", extension: "1", ring: "simultaneous" },
-      { name: "Existing Cases", extension: "2", ring: "sequential" },
-      { name: "Billing", extension: "3", ring: "sequential" },
+      { name: "New Client Intake", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Existing Cases", extension: "2", ring: "sequential", subs: [] },
+      { name: "Billing", extension: "3", ring: "sequential", subs: [] },
     ],
     afterHours: "Our office is currently closed. Please leave a detailed message with your name and case number, and an attorney will return your call within one business day.",
   },
   retail: {
     name: "Retail", icon: "🛍️",
     departments: [
-      { name: "Sales", extension: "1", ring: "simultaneous" },
-      { name: "Customer Service", extension: "2", ring: "simultaneous" },
-      { name: "Returns", extension: "3", ring: "sequential" },
+      { name: "Sales", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Customer Service", extension: "2", ring: "simultaneous", subs: [] },
+      { name: "Returns", extension: "3", ring: "sequential", subs: [] },
     ],
     afterHours: "Please leave a message or visit our website for online orders.",
   },
   professional: {
     name: "Professional Services", icon: "💼",
     departments: [
-      { name: "Consulting", extension: "1", ring: "sequential" },
-      { name: "Support", extension: "2", ring: "simultaneous" },
+      { name: "Consulting", extension: "1", ring: "sequential", subs: [] },
+      { name: "Support", extension: "2", ring: "simultaneous", subs: [] },
     ],
     afterHours: "Leave a message and we will get back to you during office hours.",
   },
   restaurant: {
     name: "Restaurant", icon: "🍽️",
     departments: [
-      { name: "Reservations", extension: "1", ring: "simultaneous" },
-      { name: "Takeout / Delivery", extension: "2", ring: "simultaneous" },
-      { name: "Events & Catering", extension: "3", ring: "sequential" },
+      { name: "Reservations", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Takeout / Delivery", extension: "2", ring: "simultaneous", subs: [] },
+      { name: "Events & Catering", extension: "3", ring: "sequential", subs: [] },
     ],
     afterHours: "We are currently closed. Visit our website for reservations or online ordering.",
   },
   automotive: {
     name: "Automotive", icon: "🚗",
     departments: [
-      { name: "Sales", extension: "1", ring: "simultaneous" },
-      { name: "Service", extension: "2", ring: "sequential" },
-      { name: "Parts", extension: "3", ring: "sequential" },
+      { name: "Sales", extension: "1", ring: "simultaneous", subs: [{ name: "New Vehicles", key: "1" }, { name: "Pre-Owned", key: "2" }] },
+      { name: "Service", extension: "2", ring: "sequential", subs: [] },
+      { name: "Parts", extension: "3", ring: "sequential", subs: [] },
     ],
     afterHours: "To schedule service or inquire about vehicle availability, please leave a message.",
   },
   realestate: {
     name: "Real Estate", icon: "🏠",
     departments: [
-      { name: "Sales / Listings", extension: "1", ring: "simultaneous" },
-      { name: "Property Mgmt", extension: "2", ring: "sequential" },
-      { name: "Leasing", extension: "3", ring: "simultaneous" },
+      { name: "Sales / Listings", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Property Mgmt", extension: "2", ring: "sequential", subs: [] },
+      { name: "Leasing", extension: "3", ring: "simultaneous", subs: [] },
     ],
     afterHours: "Our office is currently closed. Leave a message with your name and the property you're inquiring about, and an agent will return your call.",
+  },
+  construction: {
+    name: "Construction / Trades", icon: "🔨",
+    departments: [
+      { name: "New Projects / Estimates", extension: "1", ring: "simultaneous", subs: [] },
+      { name: "Current Projects", extension: "2", ring: "sequential", subs: [] },
+      { name: "Billing", extension: "3", ring: "sequential", subs: [] },
+      { name: "Emergency Service", extension: "4", ring: "simultaneous", subs: [] },
+    ],
+    afterHours: "Our office is currently closed. For emergency service requests, press 9. Otherwise, please leave your name, number, and a description of your project, and we will return your call on the next business day.",
+  },
+  salon: {
+    name: "Salon / Spa", icon: "💇",
+    departments: [
+      { name: "Book Appointment", extension: "1", ring: "simultaneous", subs: [{ name: "Hair Services", key: "1" }, { name: "Spa & Skin", key: "2" }, { name: "Nails", key: "3" }] },
+      { name: "Reschedule / Cancel", extension: "2", ring: "sequential", subs: [] },
+      { name: "Products & Gift Cards", extension: "3", ring: "simultaneous", subs: [] },
+    ],
+    afterHours: "We are currently closed. You can book or manage appointments online at our website. Leave a message and we will get back to you when we reopen.",
   },
 };
 
@@ -503,7 +500,7 @@ function renderProgress() {
   bar.innerHTML = STEPS.map(s => {
     let cls = "progress-step";
     if (s.num === currentStep) cls += " active";
-    else if (s.num < currentStep) cls += " done clickable";
+    else if (s.num < currentStep) cls += " done";
     const onclick = s.num <= currentStep ? `goToStep(${s.num})` : "";
     return `<button class="${cls}" ${onclick ? `onclick="${onclick}"` : ""}>
       <div class="step-circle">${s.num < currentStep ? "✓" : s.num}</div>
@@ -514,10 +511,7 @@ function renderProgress() {
 
 function goToStep(n) {
   if (n === 3 && currentStep === 2) generateScript();
-  if (n <= currentStep) {
-    currentStep = n;
-    showStep();
-  }
+  if (n <= currentStep) { currentStep = n; showStep(); }
 }
 
 function showStep() {
@@ -535,11 +529,8 @@ function showStep() {
 function renderNav() {
   const nav = document.getElementById("navRow");
   let html = "";
-  if (currentStep > 1) {
-    html += `<button class="btn-secondary" onclick="prevStep()">← Previous</button>`;
-  } else {
-    html += `<div></div>`;
-  }
+  if (currentStep > 1) html += `<button class="btn-secondary" onclick="prevStep()">← Previous</button>`;
+  else html += `<div></div>`;
   if (currentStep < 4) {
     const label = currentStep === 2 ? "Generate Script →" : "Next →";
     const disabled = currentStep === 1 && !document.getElementById("businessName")?.value.trim();
@@ -559,25 +550,18 @@ function nextStep() {
   if (currentStep === 4) renderStep4();
 }
 
-function prevStep() {
-  currentStep = Math.max(currentStep - 1, 1);
-  showStep();
-}
+function prevStep() { currentStep = Math.max(currentStep - 1, 1); showStep(); }
 
-// Re-check next button validity on name input
-document.addEventListener("input", e => {
-  if (e.target.id === "businessName") renderNav();
-});
+document.addEventListener("input", e => { if (e.target.id === "businessName") renderNav(); });
 
 /* ═══════════════════════════════════════════════════
-   INDUSTRY GRID
+   INDUSTRY & TONE
    ═══════════════════════════════════════════════════ */
 function renderIndustryGrid() {
   const grid = document.getElementById("industryGrid");
   grid.innerHTML = Object.entries(templates).map(([key, t]) =>
     `<div class="industry-card ${selectedIndustry === key ? "active" : ""}" onclick="selectIndustry('${key}')">
-      <span class="icon">${t.icon}</span>
-      <span>${t.name}</span>
+      <span class="icon">${t.icon}</span><span>${t.name}</span>
     </div>`
   ).join("");
 }
@@ -590,65 +574,94 @@ function selectIndustry(key) {
   updateAfterHoursPlaceholder();
 }
 
-/* ═══════════════════════════════════════════════════
-   TONE ROW
-   ═══════════════════════════════════════════════════ */
 function renderToneRow() {
   const row = document.getElementById("toneRow");
   row.innerHTML = Object.entries(tones).map(([key, t]) =>
     `<div class="tone-card ${selectedTone === key ? "active" : ""}" onclick="selectTone('${key}')">
-      <span style="font-size:22px">${t.icon}</span>
-      <strong>${t.name}</strong>
-      <span class="desc">${t.desc}</span>
+      <span style="font-size:22px">${t.icon}</span><strong>${t.name}</strong><span class="desc">${t.desc}</span>
     </div>`
   ).join("");
 }
 
-function selectTone(key) {
-  selectedTone = key;
-  renderToneRow();
-}
+function selectTone(key) { selectedTone = key; renderToneRow(); }
 
 /* ═══════════════════════════════════════════════════
-   DEPARTMENTS
+   DEPARTMENTS + SUBMENUS
    ═══════════════════════════════════════════════════ */
 function renderDepartments() {
   const list = document.getElementById("deptList");
-  list.innerHTML = departments.map((d, i) =>
-    `<div class="dept-row">
-      <input class="input input-name" value="${escHtml(d.name)}" placeholder="Department name" oninput="deptChange(${i},'name',this.value)">
-      <input class="input input-key" value="${escHtml(d.extension)}" maxlength="2" oninput="deptChange(${i},'extension',this.value)">
-      <select class="input input-ring" onchange="deptChange(${i},'ring',this.value)">
-        <option value="simultaneous" ${d.ring === "simultaneous" ? "selected" : ""}>Ring All</option>
-        <option value="sequential" ${d.ring === "sequential" ? "selected" : ""}>Ring in Order</option>
-      </select>
-      <button class="remove-btn" onclick="removeDept(${i})" title="Remove">×</button>
-    </div>`
-  ).join("");
+  list.innerHTML = departments.map((d, i) => {
+    const hasSubs = d.subs && d.subs.length > 0;
+    let html = `<div class="dept-block">
+      <div class="dept-main">
+        <input class="input input-name" value="${escHtml(d.name)}" placeholder="Department name" oninput="deptChange(${i},'name',this.value)">
+        <input class="input input-key" value="${escHtml(d.extension)}" maxlength="2" oninput="deptChange(${i},'extension',this.value)">
+        <select class="input input-ring" onchange="deptChange(${i},'ring',this.value)">
+          <option value="simultaneous" ${d.ring === "simultaneous" ? "selected" : ""}>Ring All</option>
+          <option value="sequential" ${d.ring === "sequential" ? "selected" : ""}>Ring in Order</option>
+        </select>
+        <button class="remove-btn" onclick="removeDept(${i})" title="Remove">×</button>
+      </div>`;
+
+    // Submenu toggle button
+    if (!hasSubs) {
+      html += `<button class="submenu-toggle" onclick="enableSubs(${i})">+ Add Sub-Menu</button>`;
+    }
+
+    // Submenu area
+    if (hasSubs) {
+      html += `<div class="submenu-area">
+        <div class="submenu-label">↳ Sub-Menu Options</div>`;
+      d.subs.forEach((s, si) => {
+        html += `<div class="submenu-row">
+          <input class="input input-sub-name" value="${escHtml(s.name)}" placeholder="Sub-option name" oninput="subChange(${i},${si},'name',this.value)">
+          <input class="input input-sub-key" value="${escHtml(s.key)}" maxlength="1" oninput="subChange(${i},${si},'key',this.value)">
+          <button class="sub-remove" onclick="removeSub(${i},${si})" title="Remove">×</button>
+        </div>`;
+      });
+      html += `<button class="sub-add-btn" onclick="addSub(${i})">+ Add Sub-Option</button>
+      </div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }).join("");
 }
 
-function deptChange(i, field, val) {
-  departments[i][field] = val;
-}
+function deptChange(i, field, val) { departments[i][field] = val; }
 
 function addDepartment() {
   const nextExt = String(Math.max(...departments.map(d => parseInt(d.extension) || 0), 0) + 1);
-  departments.push({ name: "", extension: nextExt, ring: "simultaneous" });
+  departments.push({ name: "", extension: nextExt, ring: "simultaneous", subs: [] });
   renderDepartments();
 }
 
-function removeDept(i) {
-  departments.splice(i, 1);
+function removeDept(i) { departments.splice(i, 1); renderDepartments(); }
+
+function enableSubs(i) {
+  departments[i].subs = [{ name: "", key: "1" }];
   renderDepartments();
 }
+
+function addSub(i) {
+  const nextKey = String(Math.max(...departments[i].subs.map(s => parseInt(s.key) || 0), 0) + 1);
+  departments[i].subs.push({ name: "", key: nextKey });
+  renderDepartments();
+}
+
+function removeSub(i, si) {
+  departments[i].subs.splice(si, 1);
+  renderDepartments();
+}
+
+function subChange(i, si, field, val) { departments[i].subs[si][field] = val; }
 
 /* ═══════════════════════════════════════════════════
    AFTER HOURS
    ═══════════════════════════════════════════════════ */
 function toggleAfterHours() {
   afterHoursEnabled = !afterHoursEnabled;
-  const btn = document.getElementById("ahToggle");
-  btn.className = afterHoursEnabled ? "toggle on" : "toggle off";
+  document.getElementById("ahToggle").className = afterHoursEnabled ? "toggle on" : "toggle off";
   document.getElementById("ahContent").style.display = afterHoursEnabled ? "block" : "none";
 }
 
@@ -668,7 +681,6 @@ function generateScript() {
   const special = document.getElementById("specialInstructions").value.trim();
   const ahMsg = document.getElementById("afterHoursMsg").value.trim();
 
-  // Greeting
   let greeting;
   if (selectedTone === "friendly") greeting = `Hello and thank you for calling ${biz}! We're glad you reached out.`;
   else if (selectedTone === "efficient") greeting = `Thank you for calling ${biz}.`;
@@ -679,13 +691,28 @@ function generateScript() {
 
   let menu = "\n\nPlease listen carefully, as our menu options may have changed.";
   departments.forEach(d => {
-    if (d.name.trim()) menu += `\nFor ${d.name}, press ${d.extension}.`;
+    if (d.name.trim()) {
+      menu += `\nFor ${d.name}, press ${d.extension}.`;
+    }
   });
   if (opExt) menu += `\nTo speak with an operator, press ${opExt}.`;
   menu += "\nTo repeat these options, press the star key.";
 
+  // Build submenu scripts for departments that have them
+  let subScripts = "";
+  departments.forEach(d => {
+    if (d.name.trim() && d.subs && d.subs.length > 0 && d.subs.some(s => s.name.trim())) {
+      subScripts += `\n\n--- ${d.name.toUpperCase()} SUB-MENU (Press ${d.extension}) ---\n`;
+      subScripts += `You've reached ${d.name}. Please select from the following:`;
+      d.subs.forEach(s => {
+        if (s.name.trim()) subScripts += `\nFor ${s.name}, press ${s.key}.`;
+      });
+      subScripts += `\nTo return to the main menu, press the star key.`;
+    }
+  });
+
   const specialLine = special ? `\n\n${special}` : "";
-  generatedMain = `${greeting}${hoursLine}${spanishLine}${menu}${specialLine}`;
+  generatedMain = `${greeting}${hoursLine}${spanishLine}${menu}${specialLine}${subScripts}`;
 
   // After-hours
   generatedAH = "";
@@ -698,7 +725,6 @@ function generateScript() {
     if (selectedIndustry === "medical") generatedAH += "\n\nIf this is a medical emergency, please hang up and dial 911 immediately.";
   }
 
-  // Populate Step 3
   document.getElementById("mainScript").value = generatedMain;
   updateScriptStats();
 
@@ -708,7 +734,6 @@ function generateScript() {
   } else {
     document.getElementById("ahScriptBox").style.display = "none";
   }
-
   document.getElementById("configPreview3").textContent = buildConfig();
 }
 
@@ -724,10 +749,7 @@ function updateScriptStats() {
   `;
 }
 
-// Live stats update
-document.addEventListener("input", e => {
-  if (e.target.id === "mainScript") updateScriptStats();
-});
+document.addEventListener("input", e => { if (e.target.id === "mainScript") updateScriptStats(); });
 
 /* ═══════════════════════════════════════════════════
    CONFIG SUMMARY
@@ -745,7 +767,14 @@ function buildConfig() {
   lines.push("");
   lines.push("MENU TREE:");
   departments.forEach(d => {
-    if (d.name.trim()) lines.push(`  Press ${d.extension} → ${d.name} (${d.ring === "simultaneous" ? "Ring All" : "Ring in Order"})`);
+    if (d.name.trim()) {
+      lines.push(`  Press ${d.extension} → ${d.name} (${d.ring === "simultaneous" ? "Ring All" : "Ring in Order"})`);
+      if (d.subs && d.subs.length > 0) {
+        d.subs.forEach(s => {
+          if (s.name.trim()) lines.push(`    Press ${s.key} → ${s.name}`);
+        });
+      }
+    }
   });
   if (opExt) lines.push(`  Press ${opExt} → Operator`);
   if (spanish) lines.push(`  Press ${departments.length + 1} → Spanish Menu`);
@@ -758,7 +787,6 @@ function buildConfig() {
    STEP 4 RENDER
    ═══════════════════════════════════════════════════ */
 function renderStep4() {
-  // Read possibly edited scripts from step 3
   generatedMain = document.getElementById("mainScript").value;
   generatedAH = document.getElementById("ahScript")?.value || "";
 
@@ -773,7 +801,7 @@ function renderStep4() {
 }
 
 /* ═══════════════════════════════════════════════════
-   EXPORT ACTIONS
+   EXPORT
    ═══════════════════════════════════════════════════ */
 function copyFullScript() {
   const full = generatedMain + (generatedAH ? "\n\n━━━ AFTER HOURS GREETING ━━━\n\n" + generatedAH : "");
@@ -785,9 +813,7 @@ function copyFullScript() {
 }
 
 function copyConfig() {
-  navigator.clipboard.writeText(buildConfig()).then(() => {
-    // brief visual feedback could be added here
-  });
+  navigator.clipboard.writeText(buildConfig());
 }
 
 /* ═══════════════════════════════════════════════════
@@ -816,6 +842,7 @@ async function sendToWebhook() {
           name: d.name,
           extension: d.extension,
           ringType: d.ring === "simultaneous" ? "Ring All" : "Ring in Order",
+          subMenu: (d.subs || []).filter(s => s.name.trim()).map(s => ({ name: s.name, key: s.key })),
         })),
         mainScript: generatedMain,
         afterHoursScript: generatedAH,
@@ -843,9 +870,6 @@ function escHtml(str) {
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* ═══════════════════════════════════════════════════
-   BOOT
-   ═══════════════════════════════════════════════════ */
 init();
 </script>
 </body>
