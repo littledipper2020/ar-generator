@@ -1,335 +1,853 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>One Talk Automated Receptionist Generator | Office Communications</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    /* --- Original Claude styles restored --- */
-    * {margin:0;padding:0;box-sizing:border-box;}
-    :root {
-      --primary:#0066CC;
-      --primary-dark:#004C99;
-      --primary-light:#E6F2FF;
-      --accent:#00CC88;
-      --text-dark:#1a1a1a;
-      --text-medium:#4a4a4a;
-      --text-light:#6a6a6a;
-      --bg-white:#ffffff;
-      --bg-gray:#f8f9fa;
-      --border:#e0e0e0;
-      --shadow-sm:0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md:0 4px 16px rgba(0,0,0,0.08);
-      --shadow-lg:0 8px 24px rgba(0,0,0,0.12);
-    }
-    body{font-family:'Karla',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f8f9fa 0%,#e8eef3 100%);color:var(--text-dark);line-height:1.6;min-height:100vh;padding:20px;}
-    #root{max-width:1000px;margin:0 auto;}
-    .header{text-align:center;padding:40px 20px;margin-bottom:40px;background:var(--bg-white);border-radius:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
-    .header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary) 0%,var(--accent) 100%);}
-    .header h1{font-size:2.2rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;letter-spacing:-0.02em;}
-    .header p{font-size:1.1rem;color:var(--text-medium);max-width:600px;margin:0 auto;}
-    .badge{display:inline-block;background:var(--primary-light);color:var(--primary-dark);padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:500;margin-top:16px;}
-    .wizard-container{background:var(--bg-white);border-radius:16px;box-shadow:var(--shadow-md);overflow:hidden;}
-    .progress-bar{display:flex;background:var(--bg-gray);padding:24px;gap:16px;}
-    .progress-step{flex:1;text-align:center;position:relative;padding:12px;border-radius:8px;transition:all 0.3s ease;}
-    .progress-step.active{background:var(--primary-light);}
-    .progress-step.completed{background:linear-gradient(135deg,var(--accent) 0%,#00AA70 100%);color:white;}
-    .step-number{width:32px;height:32px;border-radius:50%;background:var(--border);color:var(--text-medium);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:600;font-size:0.9rem;transition:all 0.3s ease;}
-    .progress-step.active .step-number{background:var(--primary);color:white;transform:scale(1.1);}
-    .progress-step.completed .step-number{background:white;color:var(--accent);}
-    .step-label{font-size:0.85rem;font-weight:500;color:var(--text-medium);}
-    .progress-step.active .step-label{color:var(--primary-dark);font-weight:600;}
-    .progress-step.completed .step-label{color:white;}
-    .wizard-content{padding:40px;}
-    .form-section{animation:slideIn 0.4s ease-out;}
-    @keyframes slideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-    .section-title{font-size:1.5rem;font-weight:700;color:var(--text-dark);margin-bottom:8px;}
-    .section-description{color:var(--text-medium);margin-bottom:32px;font-size:0.95rem;}
-    .form-group{margin-bottom:24px;}
-    label{display:block;font-weight:500;color:var(--text-dark);margin-bottom:8px;font-size:0.95rem;}
-    .label-helper{font-weight:400;color:var(--text-light);font-size:0.85rem;margin-left:4px;}
-    input[type="text"], input[type="email"], select, textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;transition:all 0.2s ease;background:var(--bg-white);}
-    input:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
-    textarea{min-height:100px;resize:vertical;}
-    .department-list{margin-top:16px;}
-    .department-item{display:flex;gap:12px;margin-bottom:12px;align-items:center;}
-    .department-item input{margin-bottom:0;}
-    .department-card{border:2px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;background:var(--bg-white);}
-    .department-header{display:flex;gap:12px;margin-bottom:12px;align-items:center;}
-    .submenu-section{margin-top:16px;padding-top:16px;border-top:2px dashed var(--border);}
-    .submenu-item{display:flex;gap:12px;margin-bottom:8px;align-items:center;padding-left:24px;}
-    .submenu-label{font-size:0.9rem;font-weight:600;color:var(--text-medium);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-    .toggle-switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
-    .switch{position:relative;width:48px;height:24px;background:var(--border);border-radius:12px;transition:background 0.3s ease;}
-    .switch.active{background:var(--primary);}
-    .switch-slider{position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.3s ease;}
-    .switch.active .switch-slider{transform:translateX(24px);}
-    .after-hours-section{background:var(--bg-gray);border-radius:12px;padding:20px;margin-top:24px;}
-    .btn{padding:12px 24px;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s ease;font-family:inherit;display:inline-flex;align-items:center;gap:8px;}
-    .btn-primary{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);color:white;box-shadow:var(--shadow-sm);}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
-    .btn-secondary{background:var(--bg-gray);color:var(--text-dark);}
-    .btn-secondary:hover{background:var(--border);}
-    .btn-small{padding:8px 16px;font-size:0.9rem;}
-    .btn-danger{background:#dc3545;color:white;}
-    .btn-danger:hover{background:#c82333;}
-    .btn-success{background:linear-gradient(135deg,var(--accent) 0%,#00AA70 100%);color:white;}
-    .wizard-actions{display:flex;justify-content:space-between;margin-top:40px;padding-top:24px;border-top:2px solid var(--bg-gray);}
-    .script-preview{background:var(--bg-gray);border:2px solid var(--border);border-radius:12px;padding:24px;margin:24px 0;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;line-height:1.8;white-space:pre-wrap;position:relative;}
-    .script-preview::before{content:'📝 Generated Script';display:block;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--primary);margin-bottom:16px;font-size:0.9rem;}
-    .editable-script{width:100%;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;line-height:1.8;border:none;background:transparent;resize:vertical;min-height:300px;}
-    .script-stats{display:flex;gap:24px;margin-top:16px;padding:16px;background:var(--bg-white);border-radius:8px;}
-    .stat{flex:1;text-align:center;}
-    .stat-value{font-size:1.5rem;font-weight:700;color:var(--primary);font-family:'IBM Plex Mono',monospace;}
-    .stat-label{font-size:0.85rem;color:var(--text-medium);margin-top:4px;}
-    .voice-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
-    .voice-card{border:2px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s ease;text-align:center;position:relative;}
-    .voice-card:hover{border-color:var(--primary);transform:translateY(-4px);box-shadow:var(--shadow-md);}
-    .voice-card.selected{border-color:var(--primary);background:var(--primary-light);}
-    .voice-card.coming-soon{opacity:0.6;cursor:not-allowed;}
-    .voice-card.coming-soon:hover{transform:none;box-shadow:none;}
-    .voice-icon{font-size:2.5rem;margin-bottom:12px;}
-    .voice-name{font-weight:600;color:var(--text-dark);margin-bottom:4px;}
-    .voice-description{font-size:0.85rem;color:var(--text-medium);}
-    .coming-soon-badge{display:inline-block;background:var(--accent);color:white;padding:4px 12px;border-radius:12px;font-size:0.75rem;font-weight:600;margin-top:8px;}
-    .export-section{text-align:center;padding:40px;}
-    .export-icon{font-size:4rem;margin-bottom:24px;animation:bounce 2s ease-in-out infinite;}
-    @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-    .export-buttons{display:flex;gap:16px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
-    .email-capture{max-width:500px;margin:32px auto;padding:24px;background:var(--bg-gray);}
-    .email-capture h3{font-size:1.2rem;margin-bottom:8px;color:var(--text-dark);}
-    .email-capture p{font-size:0.9rem;color:var(--text-medium);margin-bottom:16px;}
-    .email-input-group{display:flex;gap:12px;}
-    .email-input-group input{flex:1;}
-    .feature-coming-soon{background:linear-gradient(135deg,var(--primary-light) 0%,#E6F9F3 100%);border:2px dashed var(--primary);border-radius:12px;padding:32px;text-align:center;margin:24px 0;}
-    .feature-coming-soon h3{color:var(--primary-dark);margin-bottom:12px;font-size:1.3rem;}
-    .feature-coming-soon p{color:var(--text-medium);margin-bottom:20px;}
-    .industry-templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
-    .template-btn{padding:12px;border:2px solid var(--border);border-radius:8px;background:var(--bg-white);cursor:pointer;transition:all 0.2s ease;font-size:0.9rem;font-weight:500;}
-    .template-btn:hover{border-color:var(--primary);background:var(--primary-light);}
-    .template-btn.active{border-color:var(--primary);background:var(--primary);color:white;}
-    .tone-selector{display:flex;gap:12px;margin-bottom:24px;}
-    .tone-btn{flex:1;padding:12px;border:2px solid var(--border);border-radius:8px;background:var(--bg-white);cursor:pointer;transition:all 0.2s ease;text-align:center;}
-    .tone-btn:hover{border-color:var(--primary);}
-    .tone-btn.active{border-color:var(--primary);background:var(--primary-light);}
-    .footer{text-align:center;padding:32px 20px;margin-top:40px;color:var(--text-medium);font-size:0.9rem;}
-    .footer a{color:var(--primary);text-decoration:none;font-weight:500;}
-    .footer a:hover{text-decoration:underline;}
-    @media (max-width:768px){.header h1{font-size:1.6rem;}.wizard-content{padding:24px;}.progress-bar{padding:16px;}.step-label{display:none;}.export-buttons{flex-direction:column;}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Talk Auto Receptionist Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --surface-3: #111118;
+    --border: #1e1e2e;
+    --border-2: #2a2a3d;
+    --text: #e8e8f0;
+    --text-mid: #b0b0c8;
+    --text-dim: #8888a0;
+    --text-mute: #55556a;
+    --red: #ee0000;
+    --red-2: #ff4444;
+    --red-3: #ee3333;
+    --red-glow: rgba(238,0,0,0.35);
+    --red-soft: rgba(238,0,0,0.06);
+    --red-border: rgba(238,0,0,0.2);
+    --green: #22c55e;
+    --green-soft: rgba(34,197,94,0.08);
+    --radius: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-2xl: 14px;
+    --radius-3xl: 16px;
+    --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Space Mono', monospace;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+  ::selection { background: rgba(238,0,0,0.25); }
+  input, textarea, select, button { font-family: inherit; }
+  textarea { resize: vertical; }
+
+  /* ── LAYOUT ── */
+  .app { max-width: 880px; margin: 0 auto; padding: 0 20px 40px; }
+
+  /* ── HEADER ── */
+  .header { padding: 32px 0 28px; border-bottom: 1px solid var(--border); }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .logo-row { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 40px; height: 40px; border-radius: var(--radius-lg); background: var(--red); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #fff; box-shadow: 0 0 24px var(--red-glow); letter-spacing: -0.02em; }
+  .logo-text { font-weight: 700; font-size: 16px; letter-spacing: -0.02em; }
+  .logo-sub { color: var(--text-dim); font-weight: 400; }
+  .badge { font-family: var(--mono); font-size: 11px; color: var(--red-2); background: rgba(238,0,0,0.08); border: 1px solid var(--red-border); padding: 5px 12px; border-radius: 20px; letter-spacing: 0.04em; }
+  .header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 8px; }
+  .header p { color: var(--text-dim); font-size: 14px; line-height: 1.6; max-width: 600px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar { display: flex; gap: 6px; background: var(--surface-3); border-radius: var(--radius-2xl); padding: 8px; margin: 24px 0; border: 1px solid var(--border); overflow-x: auto; }
+  .progress-step { flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-lg); background: transparent; border: none; color: var(--text); text-align: left; transition: all 0.2s; cursor: default; opacity: 0.4; min-width: 0; }
+  .progress-step.active { background: var(--surface-2); opacity: 1; cursor: pointer; }
+  .progress-step.done { background: var(--green-soft); opacity: 1; cursor: pointer; }
+  .progress-step.clickable { cursor: pointer; }
+  .step-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; transition: all 0.2s; }
+  .progress-step.active .step-circle { border-color: var(--red); color: var(--red); }
+  .progress-step.done .step-circle { border-color: var(--green); background: var(--green); color: #000; }
+  .step-label { font-weight: 600; font-size: 13px; white-space: nowrap; }
+  .step-sub { font-size: 11px; color: var(--text-mute); white-space: nowrap; }
+
+  /* ── CONTENT PANEL ── */
+  .content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-3xl); padding: 32px 28px; }
+  .section-head { margin-bottom: 28px; }
+  .section-head h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .section-head p { color: var(--text-dim); font-size: 14px; margin-top: 4px; }
+
+  /* ── FORM ── */
+  .field { margin-bottom: 22px; }
+  .field-label { display: block; font-weight: 600; font-size: 13px; color: var(--text-mid); margin-bottom: 6px; }
+  .field-label .req { color: var(--red); }
+  .field-label .hint { font-weight: 400; color: var(--text-mute); font-size: 12px; }
+  .field-hint { color: var(--text-mute); font-size: 12px; margin-bottom: 10px; margin-top: 2px; line-height: 1.4; }
+  .input { width: 100%; padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius); color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(238,0,0,0.1); }
+  select.input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888a0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  select.input option { background: var(--surface-2); color: var(--text); }
+
+  /* ── GRIDS ── */
+  .industry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+  .industry-card { padding: 14px 10px; background: var(--surface-2); border: 2px solid var(--border-2); border-radius: var(--radius-lg); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.15s; color: var(--text); font-size: 12px; font-weight: 600; text-align: center; }
+  .industry-card:hover { border-color: #3d3d5c; background: #222233; }
+  .industry-card.active { border-color: var(--red); background: var(--red-soft); box-shadow: 0 0 20px rgba(238,0,0,0.12); }
+  .industry-card .icon { font-size: 26px; }
+
+  .tone-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tone-card { flex: 1 1 140px; padding: 14px 12px; background: var(--surface-2); border: 2px solid var(--border-2); border-radius: var(--radius-lg); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.15s; color: var(--text); font-size: 13px; }
+  .tone-card:hover { border-color: #3d3d5c; }
+  .tone-card.active { border-color: var(--red); background: var(--red-soft); }
+  .tone-card .desc { font-size: 11px; color: var(--text-mute); }
+
+  /* ── DEPARTMENTS ── */
+  .dept-header { display: flex; gap: 10px; padding: 0 14px 6px; font-size: 11px; color: var(--text-mute); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .dept-header .col-name { flex: 2; }
+  .dept-header .col-key { width: 70px; text-align: center; }
+  .dept-header .col-ring { width: 150px; }
+  .dept-header .col-del { width: 34px; }
+  .dept-row { display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-lg); margin-bottom: 8px; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .dept-row .input-name { flex: 2; }
+  .dept-row .input-key { width: 70px; text-align: center; font-family: var(--mono); font-weight: 700; }
+  .dept-row .input-ring { width: 150px; }
+  .remove-btn { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: var(--text-mute); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .remove-btn:hover { background: rgba(238,0,0,0.15); color: var(--red); }
+  .add-btn { margin-top: 4px; padding: 8px 18px; background: transparent; border: 1px dashed var(--border-2); border-radius: var(--radius); color: var(--text-dim); cursor: pointer; font-size: 13px; font-weight: 600; width: 100%; transition: all 0.15s; }
+  .add-btn:hover { border-color: var(--text-mute); color: var(--text); }
+
+  .sep { border-top: 1px solid var(--border); margin: 20px 0; }
+  .opt-row { display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap; }
+  .check-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-mid); cursor: pointer; margin-bottom: 22px; }
+  .check-label input { width: 18px; height: 18px; accent-color: var(--red); cursor: pointer; }
+
+  /* ── AFTER HOURS / BOXES ── */
+  .ah-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); margin-bottom: 22px; }
+  .ah-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .toggle { width: 48px; height: 26px; border-radius: 13px; border: none; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .toggle.on { background: var(--red-3); }
+  .toggle.off { background: var(--border-2); }
+  .toggle-knob { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 3px; transition: left 0.2s; }
+  .toggle.on .toggle-knob { left: 25px; }
+  .toggle.off .toggle-knob { left: 3px; }
+
+  /* ── SCRIPT ── */
+  .script-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); }
+  .script-label { font-size: 13px; font-weight: 700; color: var(--red-3); margin-bottom: 12px; }
+  .script-area { width: 100%; padding: 14px; background: #0e0e16; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.8; min-height: 160px; outline: none; }
+  .script-area:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(238,0,0,0.1); }
+  .script-stats { display: flex; gap: 12px; margin-top: 16px; padding: 14px; background: #0e0e16; border-radius: var(--radius); }
+  .stat { flex: 1; text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 700; color: var(--red-3); font-family: var(--mono); }
+  .stat-lbl { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  .config-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); margin-top: 20px; }
+  .config-label { font-size: 13px; font-weight: 700; color: var(--text-mid); margin-bottom: 12px; }
+  .config-pre { font-family: var(--mono); font-size: 12px; color: var(--text-dim); line-height: 1.7; white-space: pre-wrap; margin: 0; }
+  .final-pre { font-family: var(--font); font-size: 14px; color: #c8c8d8; line-height: 1.8; white-space: pre-wrap; margin: 0; }
+
+  /* ── BUTTONS ── */
+  .btn-primary { padding: 11px 22px; background: var(--red); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 16px rgba(238,0,0,0.3); transition: all 0.2s; }
+  .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-secondary { padding: 11px 22px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border-2); border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-secondary:hover { border-color: #3d3d5c; background: #222233; }
+
+  /* ── NAV / EXPORT ── */
+  .nav-row { display: flex; justify-content: space-between; margin-top: 20px; }
+  .export-btns { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .email-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); margin-top: 24px; }
+  .email-row { display: flex; gap: 10px; margin-top: 10px; }
+
+  /* ── PHASE 2 ── */
+  .phase2 { background: linear-gradient(135deg, rgba(238,0,0,0.04), rgba(238,0,0,0.01)); border: 2px dashed var(--red-border); border-radius: var(--radius-2xl); padding: 32px; text-align: center; margin-top: 28px; }
+  .phase2 h3 { margin-bottom: 6px; color: var(--red-3); }
+  .phase2 p { color: var(--text-dim); max-width: 480px; margin: 0 auto; font-size: 14px; line-height: 1.6; }
+  .voice-grid { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .voice-card { padding: 16px; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius-lg); width: 140px; text-align: center; font-size: 13px; }
+  .cs-badge { display: inline-block; background: rgba(238,0,0,0.12); color: var(--red-2); padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-top: 8px; }
+
+  .footer { text-align: center; padding: 32px 0 8px; color: var(--text-mute); font-size: 13px; }
+  .footer .red { color: var(--red-3); }
+
+  /* ── STEP VISIBILITY ── */
+  .step-panel { display: none; }
+  .step-panel.visible { display: block; animation: fadeIn 0.35s ease; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .header h1 { font-size: 22px; }
+    .content { padding: 24px 18px; }
+    .dept-header .col-ring, .dept-row .input-ring { display: none; }
+    .step-sub { display: none; }
+    .progress-step { padding: 8px 10px; }
+  }
+</style>
 </head>
 <body>
-  <div id="root"></div>
+<div class="app" id="app">
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-
-    // --- INDUSTRY CONFIGURATION WITH CUSTOM GREETINGS & AFTER-HOURS ---
-    const industryTemplates = {
-      general: { name:'General Business', emoji:'🏢', greeting:'Thank you for calling', afterHours:'Our office hours are Monday through Friday, 9 AM to 5 PM.' },
-      medical: { name:'Healthcare', emoji:'🏥', greeting:'Thank you for contacting', afterHours:'Our office hours are Monday through Friday, 8 AM to 6 PM.' },
-      retail: { name:'Retail', emoji:'🛍️', greeting:'Welcome and thank you for calling', afterHours:'Our store hours are Monday through Saturday, 10 AM to 8 PM.' },
-      professional: { name:'Professional Services', emoji:'💼', greeting:'Thank you for calling', afterHours:'Our office hours are Monday through Friday, 9 AM to 6 PM.' },
-      restaurant: { name:'Restaurant', emoji:'🍽️', greeting:'Hello and thank you for calling', afterHours:'Our restaurant hours are Monday through Sunday, 11 AM to 10 PM.' },
-      automotive: { name:'Automotive', emoji:'🚗', greeting:'Thank you for calling', afterHours:'To schedule service or inquire about vehicle availability, please choose from the options below.' }
-    };
-
-    const tones = {
-      professional: { name:'Professional', emoji:'👔' },
-      friendly: { name:'Friendly', emoji:'😊' },
-      efficient: { name:'Efficient', emoji:'⚡' }
-    };
-
-    const voiceOptions = [
-      { id:'female-warm', name:'Professional Female', description:'Warm & approachable', icon:'👩‍💼', comingSoon:true },
-      { id:'male-clear', name:'Professional Male', description:'Clear & authoritative', icon:'👨‍💼', comingSoon:true },
-      { id:'neutral', name:'Neutral Voice', description:'Modern & inclusive', icon:'🎙️', comingSoon:true }
-    ];
-
-    function AutoAttendantBuilder(){
-      const [currentStep,setCurrentStep] = useState(1);
-      const [formData,setFormData] = useState({
-        businessName:'', industry:'general', tone:'professional', hours:'',
-        departments:[
-          {name:'Sales', extension:'1', hasSubmenu:false, submenuOptions:[]},
-          {name:'Support', extension:'2', hasSubmenu:false, submenuOptions:[]}
-        ],
-        specialInstructions:'', enableAfterHours:false, afterHoursMessage:'', email:''
-      });
-      const [generatedScript,setGeneratedScript] = useState('');
-      const [selectedVoice,setSelectedVoice] = useState('female-warm');
-      const [completedSteps,setCompletedSteps] = useState([]);
-
-      const steps=[
-        {number:1,label:'Business Info'},
-        {number:2,label:'Routing'},
-        {number:3,label:'Review Script'},
-        {number:4,label:'Voice & Export'}
-      ];
-
-      const updateFormData=(field,value)=>{setFormData(prev=>({...prev,[field]:value}));};
-      const addDepartment=()=>{setFormData(prev=>({...prev,departments:[...prev.departments,{name:'',extension:'',hasSubmenu:false,submenuOptions:[]}]}));};
-      const removeDepartment=index=>{setFormData(prev=>({...prev,departments:prev.departments.filter((_,i)=>i!==index)}));};
-      const updateDepartment=(index,field,value)=>{setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===index?{...d,[field]:value}:d)}));};
-
-      const toggleSubmenu=deptIndex=>{
-        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,hasSubmenu:!d.hasSubmenu,submenuOptions:!d.hasSubmenu?[{name:'',extension:''}]:[]}:d)}));
-      };
-      const updateSubmenu=(deptIndex,subIndex,field,value)=>{
-        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>{
-          if(i!==deptIndex) return d;
-          const newSub=d.submenuOptions.map((s,j)=>j===subIndex?{...s,[field]:value}:s);
-          return {...d,submenuOptions:newSub};
-        })}));
-      };
-      const addSubmenuOption=deptIndex=>{
-        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,submenuOptions:[...d.submenuOptions,{name:'',extension:''}]}:d)}));
-      };
-      const removeSubmenuOption=(deptIndex,subIndex)=>{
-        setFormData(prev=>({...prev,departments:prev.departments.map((d,i)=>i===deptIndex?{...d,submenuOptions:d.submenuOptions.filter((_,j)=>j!==subIndex)}:d)}));
-      };
-
-      useEffect(()=>{
-        const industryData = industryTemplates[formData.industry] || industryTemplates['general'];
-        const header = `${industryData.greeting} ${formData.businessName || ''}.`;
-        let script = header + '\n\n';
-        formData.departments.forEach(d=>{
-          script+=`Press ${d.extension} for ${d.name}.\n`;
-          if(d.hasSubmenu){
-            d.submenuOptions.forEach(s=>{
-              script+=`   Press ${s.extension} for ${s.name}.\n`;
-            });
-          }
-        });
-        if(formData.enableAfterHours){
-          script+='\n'+(industryData.afterHours||formData.afterHoursMessage);
-        }
-        setGeneratedScript(script);
-      },[formData]);
-
-      const handleEmailSubmit=()=>{ 
-        // Placeholder for webhook
-        fetch('YOUR_ZAPIER_WEBHOOK_URL',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email:formData.email,script:generatedScript,cc:'onetalk@officecommunications.net'})
-        }).then(r=>alert('Email sent!')).catch(e=>alert('Error sending email.'));
-      };
-
-      return <div className="wizard-container">
-        <div className="header">
-          <h1>One Talk Auto Receptionist Builder</h1>
-          <p>Generate your business’s automated attendant script in minutes and export it as a shareable file.</p>
-          <span className="badge">🚀 Quick Setup</span>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="logo-row">
+        <div class="logo-mark">OT</div>
+        <div>
+          <div class="logo-text">One Talk <span class="logo-sub">Auto Receptionist</span></div>
         </div>
+      </div>
+      <div class="badge">PHASE 1 — SCRIPT GENERATOR</div>
+    </div>
+    <h1>Automated Receptionist Generator</h1>
+    <p>Build professional auto-attendant scripts for Verizon One Talk in minutes. Choose an industry template, customize departments, and generate a ready-to-use script.</p>
+  </header>
 
-        <div className="progress-bar">
-          {steps.map(step=>{
-            const isActive=currentStep===step.number;
-            const isCompleted=currentStep>step.number;
-            return <div key={step.number} className={`progress-step ${isActive?'active':''} ${isCompleted?'completed':''}`}>
-              <div className="step-number">{step.number}</div>
-              <div className="step-label">{step.label}</div>
-            </div>;
-          })}
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ═══ STEP 1 ═══ -->
+    <div class="step-panel visible" id="step1">
+      <div class="section-head">
+        <h2>Business Information</h2>
+        <p>Start with the basics — we'll use this to build your custom script.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Business Name <span class="req">*</span></label>
+        <input type="text" class="input" id="businessName" placeholder="e.g. Acme Dental Group">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Industry Template</label>
+        <p class="field-hint">Select your industry to pre-fill departments and messaging.</p>
+        <div class="industry-grid" id="industryGrid"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Greeting Tone</label>
+        <div class="tone-row" id="toneRow"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Business Hours <span class="hint">(optional)</span></label>
+        <input type="text" class="input" id="businessHours" placeholder="e.g. Monday – Friday, 9:00 AM – 5:00 PM" value="Monday – Friday, 9:00 AM – 5:00 PM">
+      </div>
+    </div>
+
+    <!-- ═══ STEP 2 ═══ -->
+    <div class="step-panel" id="step2">
+      <div class="section-head">
+        <h2>Call Routing & Departments</h2>
+        <p>Configure your phone menu. Each department maps to an extension key press in One Talk.</p>
+      </div>
+
+      <div class="dept-header">
+        <span class="col-name">Department</span>
+        <span class="col-key">Key</span>
+        <span class="col-ring">Ring Type</span>
+        <span class="col-del"></span>
+      </div>
+      <div id="deptList"></div>
+      <button class="add-btn" onclick="addDepartment()">+ Add Department</button>
+
+      <div class="sep"></div>
+      <div class="opt-row">
+        <div class="field" style="flex: 0 0 auto; margin-bottom: 0;">
+          <label class="field-label">Operator Extension</label>
+          <input type="text" class="input" id="operatorExt" value="0" maxlength="2" style="width:70px; text-align:center; font-family:var(--mono); font-weight:700;">
         </div>
+        <label class="check-label">
+          <input type="checkbox" id="includeSpanish">
+          Include Spanish language option
+        </label>
+      </div>
 
-        <div className="wizard-content form-section">
-          {currentStep===1 && <>
-            <div className="form-group">
-              <label>Business Name</label>
-              <input type="text" value={formData.businessName} onChange={e=>updateFormData('businessName',e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label>Industry</label>
-              <div className="industry-templates">
-                {Object.entries(industryTemplates).map(([key,data])=>
-                  <button key={key} className={`template-btn ${formData.industry===key?'active':''}`} onClick={()=>updateFormData('industry',key)}>
-                    {data.emoji} {data.name}
-                  </button>
-                )}
-              </div>
-            </div>
-          </>}
+      <div class="sep"></div>
 
-          {currentStep===2 && <>
-            {formData.departments.map((d,i)=><div key={i} className="department-card">
-              <div className="department-header">
-                <input type="text" placeholder="Department Name" value={d.name} onChange={e=>updateDepartment(i,'name',e.target.value)} />
-                <input type="text" placeholder="Extension" value={d.extension} onChange={e=>updateDepartment(i,'extension',e.target.value)} />
-                <button className="btn btn-danger btn-small" onClick={()=>removeDepartment(i)}>Delete</button>
-              </div>
-              <div className="toggle-switch" onClick={()=>toggleSubmenu(i)}>
-                <div className={`switch ${d.hasSubmenu?'active':''}`}><div className="switch-slider"></div></div>
-                <span>Add Submenu</span>
-              </div>
-              {d.hasSubmenu && <div className="submenu-section">
-                {d.submenuOptions.map((s,j)=><div key={j} className="submenu-item">
-                  <input type="text" placeholder="Option Name" value={s.name} onChange={e=>updateSubmenu(i,j,'name',e.target.value)} />
-                  <input type="text" placeholder="Extension" value={s.extension} onChange={e=>updateSubmenu(i,j,'extension',e.target.value)} />
-                  <button className="btn btn-danger btn-small" onClick={()=>removeSubmenuOption(i,j)}>Delete</button>
-                </div>)}
-                {d.submenuOptions.length<1 && <button className="btn btn-secondary btn-small" onClick={()=>addSubmenuOption(i)}>Add Option</button>}
-              </div>}
-            </div>)}
-            <button className="btn btn-primary" onClick={addDepartment}>+ Add Department</button>
-
-            <div className="form-group after-hours-section">
-              <div className="toggle-switch" onClick={()=>updateFormData('enableAfterHours',!formData.enableAfterHours)}>
-                <div className={`switch ${formData.enableAfterHours?'active':''}`}><div className="switch-slider"></div></div>
-                <span>Enable After-Hours Message</span>
-              </div>
-              {formData.enableAfterHours && <textarea placeholder="After-hours message (optional, overrides default)" value={formData.afterHoursMessage} onChange={e=>updateFormData('afterHoursMessage',e.target.value)} />}
-            </div>
-          </>}
-
-          {currentStep===3 && <>
-            <div className="script-preview"><textarea className="editable-script" value={generatedScript} onChange={e=>setGeneratedScript(e.target.value)} /></div>
-            <div className="email-capture">
-              <h3>Send Script via Email</h3>
-              <p>Enter your email to receive the generated script (CC: onetalk@officecommunications.net)</p>
-              <div className="email-input-group">
-                <input type="email" placeholder="you@example.com" value={formData.email} onChange={e=>updateFormData('email',e.target.value)} />
-                <button className="btn btn-success" onClick={handleEmailSubmit}>Send</button>
-              </div>
-            </div>
-          </>}
-
-          {currentStep===4 && <>
-            <div className="voice-options">
-              {voiceOptions.map(v=><div key={v.id} className={`voice-card ${selectedVoice===v.id?'selected':''} ${v.comingSoon?'coming-soon':''}`} onClick={()=>!v.comingSoon&&setSelectedVoice(v.id)}>
-                <div className="voice-icon">{v.icon}</div>
-                <div className="voice-name">{v.name}</div>
-                <div className="voice-description">{v.description}</div>
-                {v.comingSoon && <div className="coming-soon-badge">Coming Soon</div>}
-              </div>)}
-            </div>
-            <div className="export-section">
-              <div className="export-icon">📤</div>
-              <div className="export-buttons">
-                <button className="btn btn-primary" onClick={()=>{
-                  const doc = new jspdf.jsPDF();
-                  doc.text(generatedScript,10,10);
-                  doc.save(`${formData.businessName||'script'}.pdf`);
-                }}>Export PDF</button>
-              </div>
-            </div>
-          </>}
+      <div class="ah-box">
+        <div class="ah-top">
+          <div>
+            <strong style="font-size:15px">After-Hours Greeting</strong>
+            <p class="field-hint" style="margin-bottom:0">Plays outside of business hours</p>
+          </div>
+          <button class="toggle on" id="ahToggle" onclick="toggleAfterHours()">
+            <div class="toggle-knob"></div>
+          </button>
         </div>
-
-        <div className="wizard-actions">
-          <button className="btn btn-secondary" onClick={()=>setCurrentStep(prev=>Math.max(prev-1,1))}>Back</button>
-          <button className="btn btn-primary" onClick={()=>setCurrentStep(prev=>Math.min(prev+1,steps.length))}>Next</button>
+        <div id="ahContent">
+          <textarea class="input" id="afterHoursMsg" rows="3" placeholder="" style="min-height:80px; margin-top:8px;"></textarea>
         </div>
-      </div>;
-    }
+      </div>
 
-    ReactDOM.render(<AutoAttendantBuilder />,document.getElementById('root'));
-  </script>
+      <div class="field">
+        <label class="field-label">Special Instructions <span class="hint">(optional)</span></label>
+        <textarea class="input" id="specialInstructions" rows="3" placeholder="e.g. If you know your party's extension, you may dial it at any time." style="min-height:80px;"></textarea>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 3 ═══ -->
+    <div class="step-panel" id="step3">
+      <div class="section-head">
+        <h2>Review & Edit Script</h2>
+        <p>Your generated script is below. Feel free to edit it directly — changes are preserved.</p>
+      </div>
+
+      <div class="script-box">
+        <div class="script-label">📝 Main Greeting</div>
+        <textarea class="script-area" id="mainScript" rows="10"></textarea>
+        <div class="script-stats" id="scriptStats"></div>
+      </div>
+
+      <div class="script-box" id="ahScriptBox" style="margin-top:20px; display:none;">
+        <div class="script-label">🌙 After-Hours Greeting</div>
+        <textarea class="script-area" id="ahScript" rows="8"></textarea>
+      </div>
+
+      <div class="config-box">
+        <div class="config-label">📋 One Talk Configuration Summary</div>
+        <pre class="config-pre" id="configPreview3"></pre>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 4 ═══ -->
+    <div class="step-panel" id="step4">
+      <div style="text-align:center; padding:20px 0 10px;">
+        <div style="font-size:56px; margin-bottom:12px;">🎉</div>
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:6px;">Your Script is Ready!</h2>
+        <p style="color:var(--text-dim); max-width:500px; margin:0 auto;">Copy the script, share it with your team, or send it via email to get started with One Talk.</p>
+      </div>
+
+      <div class="export-btns">
+        <button class="btn-primary" onclick="copyFullScript()" id="copyBtn">📋 Copy Full Script</button>
+        <button class="btn-secondary" onclick="copyConfig()">📄 Copy Config Summary</button>
+      </div>
+
+      <div class="script-box" style="margin-top:24px;">
+        <div class="script-label">Main Greeting</div>
+        <pre class="final-pre" id="finalMain"></pre>
+      </div>
+      <div class="script-box" id="finalAhBox" style="margin-top:16px; display:none;">
+        <div class="script-label">After-Hours Greeting</div>
+        <pre class="final-pre" id="finalAh"></pre>
+      </div>
+
+      <div class="config-box">
+        <div class="config-label">One Talk Configuration Summary</div>
+        <pre class="config-pre" id="configPreview4"></pre>
+      </div>
+
+      <!-- Email -->
+      <div class="email-box">
+        <strong>Send Script via Email</strong>
+        <p class="field-hint">A copy will also be sent to onetalk@officecommunications.net</p>
+        <div class="email-row">
+          <input type="email" class="input" id="emailInput" placeholder="your@email.com" style="flex:1;">
+          <button class="btn-primary" id="sendBtn" onclick="sendToWebhook()" style="min-width:100px;">Send</button>
+        </div>
+      </div>
+
+      <!-- Phase 2 Teaser -->
+      <div class="phase2">
+        <div style="font-size:36px; margin-bottom:8px;">🔊</div>
+        <h3>Coming Soon — Phase 2: AI Voice Generation</h3>
+        <p>Connect to ElevenLabs to generate professional audio files directly from your script. Choose from dozens of natural-sounding voices and download MP3/WAV files ready to upload to One Talk.</p>
+        <div class="voice-grid">
+          <div class="voice-card">
+            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
+            <strong>Rachel</strong>
+            <div style="font-size:12px; color:var(--text-dim);">Warm, professional female</div>
+            <div class="cs-badge">Coming Soon</div>
+          </div>
+          <div class="voice-card">
+            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
+            <strong>Adam</strong>
+            <div style="font-size:12px; color:var(--text-dim);">Clear, authoritative male</div>
+            <div class="cs-badge">Coming Soon</div>
+          </div>
+          <div class="voice-card">
+            <div style="font-size:28px; margin-bottom:4px;">🎙️</div>
+            <strong>Bella</strong>
+            <div style="font-size:12px; color:var(--text-dim);">Friendly, approachable female</div>
+            <div class="cs-badge">Coming Soon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-row" id="navRow"></div>
+
+  <footer class="footer">Built for Verizon One Talk partners · <span class="red">Office Communications</span></footer>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════════ */
+const templates = {
+  general: {
+    name: "General Business", icon: "🏢",
+    departments: [
+      { name: "Sales", extension: "1", ring: "simultaneous" },
+      { name: "Support", extension: "2", ring: "simultaneous" },
+    ],
+    afterHours: "Please leave a message and we will return your call during business hours.",
+  },
+  medical: {
+    name: "Healthcare", icon: "🏥",
+    departments: [
+      { name: "Appointments", extension: "1", ring: "simultaneous" },
+      { name: "Billing", extension: "2", ring: "sequential" },
+      { name: "Pharmacy", extension: "3", ring: "sequential" },
+      { name: "Nurse Line", extension: "4", ring: "simultaneous" },
+    ],
+    afterHours: "If this is a medical emergency, please hang up and dial 911. For urgent matters, press 9 to reach our on-call provider. Otherwise, please leave a detailed message.",
+  },
+  legal: {
+    name: "Legal / Law Firm", icon: "⚖️",
+    departments: [
+      { name: "New Client Intake", extension: "1", ring: "simultaneous" },
+      { name: "Existing Cases", extension: "2", ring: "sequential" },
+      { name: "Billing", extension: "3", ring: "sequential" },
+    ],
+    afterHours: "Our office is currently closed. Please leave a detailed message with your name and case number, and an attorney will return your call within one business day.",
+  },
+  retail: {
+    name: "Retail", icon: "🛍️",
+    departments: [
+      { name: "Sales", extension: "1", ring: "simultaneous" },
+      { name: "Customer Service", extension: "2", ring: "simultaneous" },
+      { name: "Returns", extension: "3", ring: "sequential" },
+    ],
+    afterHours: "Please leave a message or visit our website for online orders.",
+  },
+  professional: {
+    name: "Professional Services", icon: "💼",
+    departments: [
+      { name: "Consulting", extension: "1", ring: "sequential" },
+      { name: "Support", extension: "2", ring: "simultaneous" },
+    ],
+    afterHours: "Leave a message and we will get back to you during office hours.",
+  },
+  restaurant: {
+    name: "Restaurant", icon: "🍽️",
+    departments: [
+      { name: "Reservations", extension: "1", ring: "simultaneous" },
+      { name: "Takeout / Delivery", extension: "2", ring: "simultaneous" },
+      { name: "Events & Catering", extension: "3", ring: "sequential" },
+    ],
+    afterHours: "We are currently closed. Visit our website for reservations or online ordering.",
+  },
+  automotive: {
+    name: "Automotive", icon: "🚗",
+    departments: [
+      { name: "Sales", extension: "1", ring: "simultaneous" },
+      { name: "Service", extension: "2", ring: "sequential" },
+      { name: "Parts", extension: "3", ring: "sequential" },
+    ],
+    afterHours: "To schedule service or inquire about vehicle availability, please leave a message.",
+  },
+  realestate: {
+    name: "Real Estate", icon: "🏠",
+    departments: [
+      { name: "Sales / Listings", extension: "1", ring: "simultaneous" },
+      { name: "Property Mgmt", extension: "2", ring: "sequential" },
+      { name: "Leasing", extension: "3", ring: "simultaneous" },
+    ],
+    afterHours: "Our office is currently closed. Leave a message with your name and the property you're inquiring about, and an agent will return your call.",
+  },
+};
+
+const tones = {
+  professional: { name: "Professional", icon: "👔", desc: "Formal & polished" },
+  friendly: { name: "Friendly", icon: "😊", desc: "Warm & welcoming" },
+  efficient: { name: "Efficient", icon: "⚡", desc: "Brief & direct" },
+};
+
+const STEPS = [
+  { num: 1, label: "Business Info", sub: "Name, industry & tone" },
+  { num: 2, label: "Call Routing", sub: "Departments & hours" },
+  { num: 3, label: "Review Script", sub: "Edit & customize" },
+  { num: 4, label: "Export", sub: "Download & send" },
+];
+
+/* ═══════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════ */
+let currentStep = 1;
+let selectedIndustry = "general";
+let selectedTone = "professional";
+let departments = JSON.parse(JSON.stringify(templates.general.departments));
+let afterHoursEnabled = true;
+let generatedMain = "";
+let generatedAH = "";
+
+/* ═══════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════ */
+function init() {
+  renderProgress();
+  renderIndustryGrid();
+  renderToneRow();
+  renderDepartments();
+  updateAfterHoursPlaceholder();
+  renderNav();
+}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════════════ */
+function renderProgress() {
+  const bar = document.getElementById("progressBar");
+  bar.innerHTML = STEPS.map(s => {
+    let cls = "progress-step";
+    if (s.num === currentStep) cls += " active";
+    else if (s.num < currentStep) cls += " done clickable";
+    const onclick = s.num <= currentStep ? `goToStep(${s.num})` : "";
+    return `<button class="${cls}" ${onclick ? `onclick="${onclick}"` : ""}>
+      <div class="step-circle">${s.num < currentStep ? "✓" : s.num}</div>
+      <div><div class="step-label">${s.label}</div><div class="step-sub">${s.sub}</div></div>
+    </button>`;
+  }).join("");
+}
+
+function goToStep(n) {
+  if (n === 3 && currentStep === 2) generateScript();
+  if (n <= currentStep) {
+    currentStep = n;
+    showStep();
+  }
+}
+
+function showStep() {
+  document.querySelectorAll(".step-panel").forEach((el, i) => {
+    el.classList.toggle("visible", i + 1 === currentStep);
+  });
+  renderProgress();
+  renderNav();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════ */
+function renderNav() {
+  const nav = document.getElementById("navRow");
+  let html = "";
+  if (currentStep > 1) {
+    html += `<button class="btn-secondary" onclick="prevStep()">← Previous</button>`;
+  } else {
+    html += `<div></div>`;
+  }
+  if (currentStep < 4) {
+    const label = currentStep === 2 ? "Generate Script →" : "Next →";
+    const disabled = currentStep === 1 && !document.getElementById("businessName")?.value.trim();
+    html += `<button class="btn-primary" onclick="nextStep()" ${disabled ? "disabled" : ""}>${label}</button>`;
+  }
+  nav.innerHTML = html;
+}
+
+function nextStep() {
+  if (currentStep === 1 && !document.getElementById("businessName").value.trim()) return;
+  if (currentStep === 2) {
+    if (!departments.some(d => d.name.trim())) return;
+    generateScript();
+  }
+  currentStep = Math.min(currentStep + 1, 4);
+  showStep();
+  if (currentStep === 4) renderStep4();
+}
+
+function prevStep() {
+  currentStep = Math.max(currentStep - 1, 1);
+  showStep();
+}
+
+// Re-check next button validity on name input
+document.addEventListener("input", e => {
+  if (e.target.id === "businessName") renderNav();
+});
+
+/* ═══════════════════════════════════════════════════
+   INDUSTRY GRID
+   ═══════════════════════════════════════════════════ */
+function renderIndustryGrid() {
+  const grid = document.getElementById("industryGrid");
+  grid.innerHTML = Object.entries(templates).map(([key, t]) =>
+    `<div class="industry-card ${selectedIndustry === key ? "active" : ""}" onclick="selectIndustry('${key}')">
+      <span class="icon">${t.icon}</span>
+      <span>${t.name}</span>
+    </div>`
+  ).join("");
+}
+
+function selectIndustry(key) {
+  selectedIndustry = key;
+  departments = JSON.parse(JSON.stringify(templates[key].departments));
+  renderIndustryGrid();
+  renderDepartments();
+  updateAfterHoursPlaceholder();
+}
+
+/* ═══════════════════════════════════════════════════
+   TONE ROW
+   ═══════════════════════════════════════════════════ */
+function renderToneRow() {
+  const row = document.getElementById("toneRow");
+  row.innerHTML = Object.entries(tones).map(([key, t]) =>
+    `<div class="tone-card ${selectedTone === key ? "active" : ""}" onclick="selectTone('${key}')">
+      <span style="font-size:22px">${t.icon}</span>
+      <strong>${t.name}</strong>
+      <span class="desc">${t.desc}</span>
+    </div>`
+  ).join("");
+}
+
+function selectTone(key) {
+  selectedTone = key;
+  renderToneRow();
+}
+
+/* ═══════════════════════════════════════════════════
+   DEPARTMENTS
+   ═══════════════════════════════════════════════════ */
+function renderDepartments() {
+  const list = document.getElementById("deptList");
+  list.innerHTML = departments.map((d, i) =>
+    `<div class="dept-row">
+      <input class="input input-name" value="${escHtml(d.name)}" placeholder="Department name" oninput="deptChange(${i},'name',this.value)">
+      <input class="input input-key" value="${escHtml(d.extension)}" maxlength="2" oninput="deptChange(${i},'extension',this.value)">
+      <select class="input input-ring" onchange="deptChange(${i},'ring',this.value)">
+        <option value="simultaneous" ${d.ring === "simultaneous" ? "selected" : ""}>Ring All</option>
+        <option value="sequential" ${d.ring === "sequential" ? "selected" : ""}>Ring in Order</option>
+      </select>
+      <button class="remove-btn" onclick="removeDept(${i})" title="Remove">×</button>
+    </div>`
+  ).join("");
+}
+
+function deptChange(i, field, val) {
+  departments[i][field] = val;
+}
+
+function addDepartment() {
+  const nextExt = String(Math.max(...departments.map(d => parseInt(d.extension) || 0), 0) + 1);
+  departments.push({ name: "", extension: nextExt, ring: "simultaneous" });
+  renderDepartments();
+}
+
+function removeDept(i) {
+  departments.splice(i, 1);
+  renderDepartments();
+}
+
+/* ═══════════════════════════════════════════════════
+   AFTER HOURS
+   ═══════════════════════════════════════════════════ */
+function toggleAfterHours() {
+  afterHoursEnabled = !afterHoursEnabled;
+  const btn = document.getElementById("ahToggle");
+  btn.className = afterHoursEnabled ? "toggle on" : "toggle off";
+  document.getElementById("ahContent").style.display = afterHoursEnabled ? "block" : "none";
+}
+
+function updateAfterHoursPlaceholder() {
+  const ta = document.getElementById("afterHoursMsg");
+  if (ta) ta.placeholder = templates[selectedIndustry].afterHours + " (default — edit to customize)";
+}
+
+/* ═══════════════════════════════════════════════════
+   SCRIPT GENERATION
+   ═══════════════════════════════════════════════════ */
+function generateScript() {
+  const biz = document.getElementById("businessName").value.trim() || "[Business Name]";
+  const hours = document.getElementById("businessHours").value.trim();
+  const opExt = document.getElementById("operatorExt").value.trim();
+  const spanish = document.getElementById("includeSpanish").checked;
+  const special = document.getElementById("specialInstructions").value.trim();
+  const ahMsg = document.getElementById("afterHoursMsg").value.trim();
+
+  // Greeting
+  let greeting;
+  if (selectedTone === "friendly") greeting = `Hello and thank you for calling ${biz}! We're glad you reached out.`;
+  else if (selectedTone === "efficient") greeting = `Thank you for calling ${biz}.`;
+  else greeting = `Thank you for calling ${biz}. Your call is important to us.`;
+
+  const hoursLine = hours ? `\nOur office hours are ${hours}.` : "";
+  const spanishLine = spanish ? `\nPara español, oprima el ${departments.length + 1}.` : "";
+
+  let menu = "\n\nPlease listen carefully, as our menu options may have changed.";
+  departments.forEach(d => {
+    if (d.name.trim()) menu += `\nFor ${d.name}, press ${d.extension}.`;
+  });
+  if (opExt) menu += `\nTo speak with an operator, press ${opExt}.`;
+  menu += "\nTo repeat these options, press the star key.";
+
+  const specialLine = special ? `\n\n${special}` : "";
+  generatedMain = `${greeting}${hoursLine}${spanishLine}${menu}${specialLine}`;
+
+  // After-hours
+  generatedAH = "";
+  if (afterHoursEnabled) {
+    const customMsg = ahMsg || templates[selectedIndustry].afterHours;
+    generatedAH = `Thank you for calling ${biz}. Our office is currently closed.`;
+    if (hours) generatedAH += `\n${hoursLine.trim()}`;
+    generatedAH += `\n\n${customMsg}`;
+    generatedAH += "\n\nPlease leave a message after the tone with your name, number, and a brief description of your inquiry, and we will return your call as soon as possible.";
+    if (selectedIndustry === "medical") generatedAH += "\n\nIf this is a medical emergency, please hang up and dial 911 immediately.";
+  }
+
+  // Populate Step 3
+  document.getElementById("mainScript").value = generatedMain;
+  updateScriptStats();
+
+  if (generatedAH) {
+    document.getElementById("ahScriptBox").style.display = "block";
+    document.getElementById("ahScript").value = generatedAH;
+  } else {
+    document.getElementById("ahScriptBox").style.display = "none";
+  }
+
+  document.getElementById("configPreview3").textContent = buildConfig();
+}
+
+function updateScriptStats() {
+  const text = document.getElementById("mainScript").value;
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const dur = Math.ceil(words / 2.5);
+  const opts = departments.filter(d => d.name.trim()).length;
+  document.getElementById("scriptStats").innerHTML = `
+    <div class="stat"><div class="stat-val">${words}</div><div class="stat-lbl">Words</div></div>
+    <div class="stat"><div class="stat-val">${dur}s</div><div class="stat-lbl">Est. Duration</div></div>
+    <div class="stat"><div class="stat-val">${opts}</div><div class="stat-lbl">Menu Options</div></div>
+  `;
+}
+
+// Live stats update
+document.addEventListener("input", e => {
+  if (e.target.id === "mainScript") updateScriptStats();
+});
+
+/* ═══════════════════════════════════════════════════
+   CONFIG SUMMARY
+   ═══════════════════════════════════════════════════ */
+function buildConfig() {
+  const biz = document.getElementById("businessName").value.trim() || "—";
+  const hours = document.getElementById("businessHours").value.trim() || "Not specified";
+  const opExt = document.getElementById("operatorExt").value.trim();
+  const spanish = document.getElementById("includeSpanish").checked;
+
+  const lines = [];
+  lines.push(`BUSINESS: ${biz}`);
+  lines.push(`INDUSTRY: ${templates[selectedIndustry].name}`);
+  lines.push(`HOURS: ${hours}`);
+  lines.push("");
+  lines.push("MENU TREE:");
+  departments.forEach(d => {
+    if (d.name.trim()) lines.push(`  Press ${d.extension} → ${d.name} (${d.ring === "simultaneous" ? "Ring All" : "Ring in Order"})`);
+  });
+  if (opExt) lines.push(`  Press ${opExt} → Operator`);
+  if (spanish) lines.push(`  Press ${departments.length + 1} → Spanish Menu`);
+  lines.push("  Press * → Repeat Menu");
+  if (afterHoursEnabled) { lines.push(""); lines.push("AFTER HOURS: Enabled"); }
+  return lines.join("\n");
+}
+
+/* ═══════════════════════════════════════════════════
+   STEP 4 RENDER
+   ═══════════════════════════════════════════════════ */
+function renderStep4() {
+  // Read possibly edited scripts from step 3
+  generatedMain = document.getElementById("mainScript").value;
+  generatedAH = document.getElementById("ahScript")?.value || "";
+
+  document.getElementById("finalMain").textContent = generatedMain;
+  if (generatedAH) {
+    document.getElementById("finalAhBox").style.display = "block";
+    document.getElementById("finalAh").textContent = generatedAH;
+  } else {
+    document.getElementById("finalAhBox").style.display = "none";
+  }
+  document.getElementById("configPreview4").textContent = buildConfig();
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT ACTIONS
+   ═══════════════════════════════════════════════════ */
+function copyFullScript() {
+  const full = generatedMain + (generatedAH ? "\n\n━━━ AFTER HOURS GREETING ━━━\n\n" + generatedAH : "");
+  navigator.clipboard.writeText(full).then(() => {
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "✓ Copied!";
+    setTimeout(() => btn.textContent = "📋 Copy Full Script", 2000);
+  });
+}
+
+function copyConfig() {
+  navigator.clipboard.writeText(buildConfig()).then(() => {
+    // brief visual feedback could be added here
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ZAPIER WEBHOOK
+   ═══════════════════════════════════════════════════ */
+async function sendToWebhook() {
+  const email = document.getElementById("emailInput").value.trim();
+  const btn = document.getElementById("sendBtn");
+  if (!email || btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  try {
+    const full = generatedMain + (generatedAH ? "\n\n━━━ AFTER HOURS GREETING ━━━\n\n" + generatedAH : "");
+    await fetch("https://hooks.zapier.com/hooks/catch/2630762/uc1zyf1/", {
+      method: "POST",
+      body: JSON.stringify({
+        email: email,
+        cc: "onetalk@officecommunications.net",
+        businessName: document.getElementById("businessName").value.trim(),
+        industry: templates[selectedIndustry].name,
+        tone: selectedTone,
+        hours: document.getElementById("businessHours").value.trim(),
+        departments: departments.filter(d => d.name.trim()).map(d => ({
+          name: d.name,
+          extension: d.extension,
+          ringType: d.ring === "simultaneous" ? "Ring All" : "Ring in Order",
+        })),
+        mainScript: generatedMain,
+        afterHoursScript: generatedAH,
+        configSummary: buildConfig(),
+        fullScript: full,
+        includeSpanish: document.getElementById("includeSpanish").checked,
+        operatorExtension: document.getElementById("operatorExt").value.trim(),
+        timestamp: new Date().toISOString(),
+      }),
+    });
+    btn.textContent = "✓ Sent!";
+    setTimeout(() => { btn.textContent = "Send"; btn.disabled = false; }, 4000);
+  } catch (err) {
+    console.error("Webhook error:", err);
+    alert("Something went wrong sending the script. Please try again or copy the script manually.");
+    btn.textContent = "Send";
+    btn.disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   UTIL
+   ═══════════════════════════════════════════════════ */
+function escHtml(str) {
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ═══════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════ */
+init();
+</script>
 </body>
 </html>
+
