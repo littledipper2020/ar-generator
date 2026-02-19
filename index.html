@@ -269,11 +269,15 @@
 
       <div class="sep"></div>
       <div class="opt-row">
-        <div class="field" style="flex: 0 0 auto; margin-bottom: 0;">
-          <label class="field-label">Operator Extension</label>
-          <input type="text" class="input" id="operatorExt" value="0" maxlength="2" style="width:70px; text-align:center; font-family:var(--mono); font-weight:700;">
+        <label class="check-label" style="margin-bottom:0;">
+          <input type="checkbox" id="enableOperator" checked onchange="toggleOperator()">
+          Include Operator extension
+        </label>
+        <div class="field" id="operatorExtField" style="flex: 0 0 auto; margin-bottom: 0;">
+          <label class="field-label">Operator Key</label>
+          <input type="text" class="input" id="operatorExt" value="0" maxlength="2" style="width:70px; text-align:center; font-family:var(--mono); font-weight:700;" oninput="onOperatorChange()">
         </div>
-        <label class="check-label">
+        <label class="check-label" style="margin-bottom:0;">
           <input type="checkbox" id="includeSpanish">
           Include Spanish language option
         </label>
@@ -688,6 +692,25 @@ function removeSub(i, si) {
 function subChange(i, si, field, val) { departments[i].subs[si][field] = val; }
 
 /* ═══════════════════════════════════════════════════
+   OPERATOR EXTENSION
+   ═══════════════════════════════════════════════════ */
+function toggleOperator() {
+  const enabled = document.getElementById("enableOperator").checked;
+  document.getElementById("operatorExtField").style.display = enabled ? "block" : "none";
+  if (ahMode === "mirror") renderAhContent();
+}
+
+function onOperatorChange() {
+  if (ahMode === "mirror") renderAhContent();
+}
+
+function getOperatorExt() {
+  const enabled = document.getElementById("enableOperator")?.checked;
+  if (!enabled) return "";
+  return document.getElementById("operatorExt")?.value.trim() || "";
+}
+
+/* ═══════════════════════════════════════════════════
    AFTER HOURS
    ═══════════════════════════════════════════════════ */
 function toggleAfterHours() {
@@ -710,11 +733,15 @@ function renderAhContent() {
   if (ahMode === "mirror") {
     // Show a preview of what the mirrored menu will look like
     const activeDepts = departments.filter(d => d.name.trim());
+    const opExt = getOperatorExt();
     let previewLines = "";
     if (activeDepts.length > 0) {
       activeDepts.forEach(d => {
         previewLines += `<div style="padding:2px 0;">Press <strong>${d.extension}</strong> → Leave a message for <strong>${d.name}</strong></div>`;
       });
+      if (opExt) {
+        previewLines += `<div style="padding:2px 0;">Press <strong>${opExt}</strong> → Leave a general message</div>`;
+      }
     } else {
       previewLines = '<em>Add departments above to see the mirrored menu</em>';
     }
@@ -764,7 +791,7 @@ function removeAhCustom(i) {
 function generateScript() {
   const biz = document.getElementById("businessName").value.trim() || "[Business Name]";
   const hours = document.getElementById("businessHours").value.trim();
-  const opExt = document.getElementById("operatorExt").value.trim();
+  const opExt = getOperatorExt();
   const spanish = document.getElementById("includeSpanish").checked;
   const special = document.getElementById("specialInstructions").value.trim();
 
@@ -816,11 +843,12 @@ function generateScript() {
     if (ahMode === "mirror") {
       // Mirror main menu departments with "leave a message" language
       const activeDepts = departments.filter(d => d.name.trim());
-      if (activeDepts.length > 0) {
+      if (activeDepts.length > 0 || opExt) {
         generatedAH += "\n\nPlease select from the following options:";
         activeDepts.forEach(d => {
           generatedAH += `\nTo leave a message for ${d.name}, press ${d.extension}.`;
         });
+        if (opExt) generatedAH += `\nTo leave a general message, press ${opExt}.`;
         generatedAH += "\nTo repeat these options, press the pound key.";
       }
     } else {
@@ -868,7 +896,7 @@ document.addEventListener("input", e => { if (e.target.id === "mainScript") upda
 function buildConfig() {
   const biz = document.getElementById("businessName").value.trim() || "—";
   const hours = document.getElementById("businessHours").value.trim() || "Not specified";
-  const opExt = document.getElementById("operatorExt").value.trim();
+  const opExt = getOperatorExt();
   const spanish = document.getElementById("includeSpanish").checked;
 
   const lines = [];
@@ -898,6 +926,7 @@ function buildConfig() {
       departments.forEach(d => {
         if (d.name.trim()) lines.push(`  Press ${d.extension} → Leave message for ${d.name}`);
       });
+      if (opExt) lines.push(`  Press ${opExt} → Leave a general message`);
     } else {
       ahCustomOptions.forEach(o => {
         if (o.name.trim()) lines.push(`  Press ${o.key} → ${o.name}`);
@@ -975,7 +1004,7 @@ async function sendToWebhook() {
         configSummary: buildConfig(),
         fullScript: full,
         includeSpanish: document.getElementById("includeSpanish").checked,
-        operatorExtension: document.getElementById("operatorExt").value.trim(),
+        operatorExtension: getOperatorExt(),
         timestamp: new Date().toISOString(),
       }),
     });
