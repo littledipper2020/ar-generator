@@ -834,10 +834,6 @@ function generateScript() {
     generatedAH = `Thank you for calling ${biz}. You've reached us after hours.`;
     if (hours) generatedAH += ` Our regular business hours are ${hours}.`;
 
-    if (selectedIndustry === "medical") {
-      generatedAH += "\n\nIf this is a medical emergency, please hang up and dial 911 immediately.";
-    }
-
     generatedAH += `\n\n${templates[selectedIndustry].afterHours}`;
 
     if (ahMode === "mirror") {
