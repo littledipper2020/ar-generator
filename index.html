@@ -97,7 +97,6 @@
   .dept-header { display: flex; gap: 10px; padding: 0 14px 6px; font-size: 11px; color: var(--text-mute); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
   .dept-header .col-name { flex: 2; }
   .dept-header .col-key { width: 70px; text-align: center; }
-  .dept-header .col-ring { width: 150px; }
   .dept-header .col-del { width: 34px; }
 
   .dept-block { margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.25s ease; }
@@ -105,7 +104,6 @@
   .dept-main { display: flex; gap: 10px; align-items: center; padding: 8px 10px; }
   .dept-main .input-name { flex: 2; }
   .dept-main .input-key { width: 70px; text-align: center; font-family: var(--mono); font-weight: 700; }
-  .dept-main .input-ring { width: 150px; }
   .remove-btn { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: var(--text-mute); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
   .remove-btn:hover { background: rgba(238,0,0,0.15); color: var(--red); }
 
@@ -140,6 +138,25 @@
   .toggle-knob { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 3px; transition: left 0.2s; }
   .toggle.on .toggle-knob { left: 25px; }
   .toggle.off .toggle-knob { left: 3px; }
+
+  .ah-mode-row { display: flex; gap: 10px; margin: 16px 0 12px; }
+  .ah-mode-btn { flex: 1; padding: 14px 12px; background: var(--surface-2); border: 2px solid var(--border-2); border-radius: var(--radius-lg); cursor: pointer; text-align: center; transition: all 0.15s; color: var(--text); font-family: inherit; font-size: 13px; }
+  .ah-mode-btn:hover { border-color: #3d3d5c; }
+  .ah-mode-btn.active { border-color: var(--red); background: var(--red-soft); }
+  .ah-mode-btn .mode-icon { font-size: 20px; margin-bottom: 4px; }
+  .ah-mode-btn .mode-title { font-weight: 700; font-size: 13px; }
+  .ah-mode-btn .mode-desc { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+
+  .ah-preview { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-top: 12px; font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .ah-preview strong { color: var(--text-mid); }
+
+  .ah-custom-list { margin-top: 12px; }
+  .ah-custom-header { display: flex; gap: 10px; padding: 0 4px 6px; font-size: 11px; color: var(--text-mute); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .ah-custom-row { display: flex; gap: 10px; align-items: center; padding: 6px 0; animation: fadeIn 0.25s ease; }
+  .ah-custom-row .input-ah-name { flex: 2; font-size: 13px; padding: 8px 12px; }
+  .ah-custom-row .input-ah-key { width: 60px; text-align: center; font-family: var(--mono); font-weight: 700; font-size: 13px; padding: 8px; }
+  .ah-custom-add { margin-top: 6px; padding: 6px 14px; background: transparent; border: 1px dashed var(--border-2); border-radius: 6px; color: var(--text-mute); cursor: pointer; font-size: 12px; font-weight: 600; width: 100%; font-family: inherit; transition: all 0.15s; }
+  .ah-custom-add:hover { border-color: var(--text-mute); color: var(--text-dim); }
 
   /* ── SCRIPT ── */
   .script-box { background: var(--surface-3); border-radius: var(--radius-xl); padding: 20px; border: 1px solid var(--border); }
@@ -186,7 +203,6 @@
   @media (max-width: 640px) {
     .header h1 { font-size: 22px; }
     .content { padding: 24px 18px; }
-    .dept-header .col-ring, .dept-main .input-ring { display: none; }
     .step-sub { display: none; }
     .progress-step { padding: 8px 10px; }
   }
@@ -246,7 +262,6 @@
       <div class="dept-header">
         <span class="col-name">Department</span>
         <span class="col-key">Key</span>
-        <span class="col-ring">Ring Type</span>
         <span class="col-del"></span>
       </div>
       <div id="deptList"></div>
@@ -269,14 +284,27 @@
         <div class="ah-top">
           <div>
             <strong style="font-size:15px">After-Hours Greeting</strong>
-            <p class="field-hint" style="margin-bottom:0">Plays outside of business hours</p>
+            <p class="field-hint" style="margin-bottom:0">Plays outside of business hours. Callers will still need to select an option.</p>
           </div>
           <button class="toggle on" id="ahToggle" onclick="toggleAfterHours()">
             <div class="toggle-knob"></div>
           </button>
         </div>
         <div id="ahContent">
-          <textarea class="input" id="afterHoursMsg" rows="3" placeholder="" style="min-height:80px; margin-top:8px;"></textarea>
+          <p class="field-hint">How should callers be routed after hours?</p>
+          <div class="ah-mode-row">
+            <button class="ah-mode-btn active" id="ahModeMirror" onclick="setAhMode('mirror')">
+              <div class="mode-icon">🔁</div>
+              <div class="mode-title">Mirror Main Menu</div>
+              <div class="mode-desc">Same departments, "leave a message" language</div>
+            </button>
+            <button class="ah-mode-btn" id="ahModeCustom" onclick="setAhMode('custom')">
+              <div class="mode-icon">✏️</div>
+              <div class="mode-title">Custom Menu</div>
+              <div class="mode-desc">Different options for after hours</div>
+            </button>
+          </div>
+          <div id="ahModeContent"></div>
         </div>
       </div>
       <div class="field">
@@ -333,7 +361,7 @@
       <!-- Email -->
       <div class="email-box">
         <strong>Send Script via Email</strong>
-        <p class="field-hint">A copy will also be sent to onetalk@officecommunications.net</p>
+        <p class="field-hint">A copy will also be sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="523d3c3726333e39123d34343b3137313d3f3f273c3b3133263b3d3c217c3c3726">[email&#160;protected]</a></p>
         <div class="email-row">
           <input type="email" class="input" id="emailInput" placeholder="your@email.com" style="flex:1;">
           <button class="btn-primary" id="sendBtn" onclick="sendToWebhook()" style="min-width:100px;">Send</button>
@@ -359,7 +387,7 @@
   <footer class="footer">Built for Verizon One Talk partners · <span class="red">Office Communications</span></footer>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ═══════════════════════════════════════════════════
    DATA — Industry Templates
    ═══════════════════════════════════════════════════ */
@@ -477,6 +505,10 @@ let selectedIndustry = "general";
 let selectedTone = "professional";
 let departments = JSON.parse(JSON.stringify(templates.general.departments));
 let afterHoursEnabled = true;
+let ahMode = "mirror"; // "mirror" or "custom"
+let ahCustomOptions = [
+  { name: "Leave a General Message", key: "1" },
+];
 let generatedMain = "";
 let generatedAH = "";
 
@@ -488,7 +520,7 @@ function init() {
   renderIndustryGrid();
   renderToneRow();
   renderDepartments();
-  updateAfterHoursPlaceholder();
+  renderAhContent();
   renderNav();
 }
 
@@ -571,7 +603,6 @@ function selectIndustry(key) {
   departments = JSON.parse(JSON.stringify(templates[key].departments));
   renderIndustryGrid();
   renderDepartments();
-  updateAfterHoursPlaceholder();
 }
 
 function renderToneRow() {
@@ -596,10 +627,6 @@ function renderDepartments() {
       <div class="dept-main">
         <input class="input input-name" value="${escHtml(d.name)}" placeholder="Department name" oninput="deptChange(${i},'name',this.value)">
         <input class="input input-key" value="${escHtml(d.extension)}" maxlength="2" oninput="deptChange(${i},'extension',this.value)">
-        <select class="input input-ring" onchange="deptChange(${i},'ring',this.value)">
-          <option value="simultaneous" ${d.ring === "simultaneous" ? "selected" : ""}>Ring All</option>
-          <option value="sequential" ${d.ring === "sequential" ? "selected" : ""}>Ring in Order</option>
-        </select>
         <button class="remove-btn" onclick="removeDept(${i})" title="Remove">×</button>
       </div>`;
 
@@ -628,15 +655,19 @@ function renderDepartments() {
   }).join("");
 }
 
-function deptChange(i, field, val) { departments[i][field] = val; }
+function deptChange(i, field, val) {
+  departments[i][field] = val;
+  if (ahMode === "mirror") renderAhContent();
+}
 
 function addDepartment() {
   const nextExt = String(Math.max(...departments.map(d => parseInt(d.extension) || 0), 0) + 1);
   departments.push({ name: "", extension: nextExt, ring: "simultaneous", subs: [] });
   renderDepartments();
+  if (ahMode === "mirror") renderAhContent();
 }
 
-function removeDept(i) { departments.splice(i, 1); renderDepartments(); }
+function removeDept(i) { departments.splice(i, 1); renderDepartments(); if (ahMode === "mirror") renderAhContent(); }
 
 function enableSubs(i) {
   departments[i].subs = [{ name: "", key: "1" }];
@@ -665,9 +696,66 @@ function toggleAfterHours() {
   document.getElementById("ahContent").style.display = afterHoursEnabled ? "block" : "none";
 }
 
-function updateAfterHoursPlaceholder() {
-  const ta = document.getElementById("afterHoursMsg");
-  if (ta) ta.placeholder = templates[selectedIndustry].afterHours + " (default — edit to customize)";
+function setAhMode(mode) {
+  ahMode = mode;
+  document.getElementById("ahModeMirror").className = "ah-mode-btn" + (mode === "mirror" ? " active" : "");
+  document.getElementById("ahModeCustom").className = "ah-mode-btn" + (mode === "custom" ? " active" : "");
+  renderAhContent();
+}
+
+function renderAhContent() {
+  const container = document.getElementById("ahModeContent");
+  if (!container) return;
+
+  if (ahMode === "mirror") {
+    // Show a preview of what the mirrored menu will look like
+    const activeDepts = departments.filter(d => d.name.trim());
+    let previewLines = "";
+    if (activeDepts.length > 0) {
+      activeDepts.forEach(d => {
+        previewLines += `<div style="padding:2px 0;">Press <strong>${d.extension}</strong> → Leave a message for <strong>${d.name}</strong></div>`;
+      });
+    } else {
+      previewLines = '<em>Add departments above to see the mirrored menu</em>';
+    }
+    container.innerHTML = `
+      <div class="ah-preview">
+        <div style="font-size:11px; font-weight:700; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">After-Hours Menu Preview</div>
+        ${previewLines}
+      </div>`;
+  } else {
+    // Custom menu builder
+    let html = `
+      <div class="ah-custom-list">
+        <div class="ah-custom-header">
+          <span style="flex:2">Option</span>
+          <span style="width:60px; text-align:center;">Key</span>
+          <span style="width:28px"></span>
+        </div>`;
+    ahCustomOptions.forEach((opt, i) => {
+      html += `<div class="ah-custom-row">
+        <input class="input input-ah-name" value="${escHtml(opt.name)}" placeholder="e.g. Leave a message, Emergency line" oninput="ahCustomChange(${i},'name',this.value)">
+        <input class="input input-ah-key" value="${escHtml(opt.key)}" maxlength="2" oninput="ahCustomChange(${i},'key',this.value)">
+        <button class="sub-remove" onclick="removeAhCustom(${i})" title="Remove">×</button>
+      </div>`;
+    });
+    html += `</div>
+      <button class="ah-custom-add" onclick="addAhCustom()">+ Add Option</button>`;
+    container.innerHTML = html;
+  }
+}
+
+function ahCustomChange(i, field, val) { ahCustomOptions[i][field] = val; }
+
+function addAhCustom() {
+  const nextKey = String(Math.max(...ahCustomOptions.map(o => parseInt(o.key) || 0), 0) + 1);
+  ahCustomOptions.push({ name: "", key: nextKey });
+  renderAhContent();
+}
+
+function removeAhCustom(i) {
+  ahCustomOptions.splice(i, 1);
+  renderAhContent();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -679,7 +767,6 @@ function generateScript() {
   const opExt = document.getElementById("operatorExt").value.trim();
   const spanish = document.getElementById("includeSpanish").checked;
   const special = document.getElementById("specialInstructions").value.trim();
-  const ahMsg = document.getElementById("afterHoursMsg").value.trim();
 
   let greeting;
   if (selectedTone === "friendly") greeting = `Hello and thank you for calling ${biz}! We're glad you reached out.`;
@@ -696,7 +783,7 @@ function generateScript() {
     }
   });
   if (opExt) menu += `\nTo speak with an operator, press ${opExt}.`;
-  menu += "\nTo repeat these options, press the star key.";
+  menu += "\nTo repeat these options, press the pound key.";
 
   // Build submenu scripts for departments that have them
   let subScripts = "";
@@ -707,7 +794,7 @@ function generateScript() {
       d.subs.forEach(s => {
         if (s.name.trim()) subScripts += `\nFor ${s.name}, press ${s.key}.`;
       });
-      subScripts += `\nTo return to the main menu, press the star key.`;
+      subScripts += `\nTo return to the main menu, press the pound key.`;
     }
   });
 
@@ -717,12 +804,36 @@ function generateScript() {
   // After-hours
   generatedAH = "";
   if (afterHoursEnabled) {
-    const customMsg = ahMsg || templates[selectedIndustry].afterHours;
-    generatedAH = `Thank you for calling ${biz}. Our office is currently closed.`;
-    if (hours) generatedAH += `\n${hoursLine.trim()}`;
-    generatedAH += `\n\n${customMsg}`;
-    generatedAH += "\n\nPlease leave a message after the tone with your name, number, and a brief description of your inquiry, and we will return your call as soon as possible.";
-    if (selectedIndustry === "medical") generatedAH += "\n\nIf this is a medical emergency, please hang up and dial 911 immediately.";
+    generatedAH = `Thank you for calling ${biz}. You've reached us after hours.`;
+    if (hours) generatedAH += ` Our regular business hours are ${hours}.`;
+
+    if (selectedIndustry === "medical") {
+      generatedAH += "\n\nIf this is a medical emergency, please hang up and dial 911 immediately.";
+    }
+
+    generatedAH += `\n\n${templates[selectedIndustry].afterHours}`;
+
+    if (ahMode === "mirror") {
+      // Mirror main menu departments with "leave a message" language
+      const activeDepts = departments.filter(d => d.name.trim());
+      if (activeDepts.length > 0) {
+        generatedAH += "\n\nPlease select from the following options:";
+        activeDepts.forEach(d => {
+          generatedAH += `\nTo leave a message for ${d.name}, press ${d.extension}.`;
+        });
+        generatedAH += "\nTo repeat these options, press the pound key.";
+      }
+    } else {
+      // Custom after-hours options
+      const activeOpts = ahCustomOptions.filter(o => o.name.trim());
+      if (activeOpts.length > 0) {
+        generatedAH += "\n\nPlease select from the following options:";
+        activeOpts.forEach(o => {
+          generatedAH += `\nFor ${o.name}, press ${o.key}.`;
+        });
+        generatedAH += "\nTo repeat these options, press the pound key.";
+      }
+    }
   }
 
   document.getElementById("mainScript").value = generatedMain;
@@ -768,7 +879,7 @@ function buildConfig() {
   lines.push("MENU TREE:");
   departments.forEach(d => {
     if (d.name.trim()) {
-      lines.push(`  Press ${d.extension} → ${d.name} (${d.ring === "simultaneous" ? "Ring All" : "Ring in Order"})`);
+      lines.push(`  Press ${d.extension} → ${d.name}`);
       if (d.subs && d.subs.length > 0) {
         d.subs.forEach(s => {
           if (s.name.trim()) lines.push(`    Press ${s.key} → ${s.name}`);
@@ -778,8 +889,22 @@ function buildConfig() {
   });
   if (opExt) lines.push(`  Press ${opExt} → Operator`);
   if (spanish) lines.push(`  Press ${departments.length + 1} → Spanish Menu`);
-  lines.push("  Press * → Repeat Menu");
-  if (afterHoursEnabled) { lines.push(""); lines.push("AFTER HOURS: Enabled"); }
+  lines.push("  Press # → Repeat Menu");
+  if (afterHoursEnabled) {
+    lines.push("");
+    lines.push("AFTER HOURS: Enabled");
+    lines.push(`  Mode: ${ahMode === "mirror" ? "Mirror Main Menu" : "Custom Menu"}`);
+    if (ahMode === "mirror") {
+      departments.forEach(d => {
+        if (d.name.trim()) lines.push(`  Press ${d.extension} → Leave message for ${d.name}`);
+      });
+    } else {
+      ahCustomOptions.forEach(o => {
+        if (o.name.trim()) lines.push(`  Press ${o.key} → ${o.name}`);
+      });
+    }
+    lines.push("  Press # → Repeat Menu");
+  }
   return lines.join("\n");
 }
 
@@ -841,11 +966,12 @@ async function sendToWebhook() {
         departments: departments.filter(d => d.name.trim()).map(d => ({
           name: d.name,
           extension: d.extension,
-          ringType: d.ring === "simultaneous" ? "Ring All" : "Ring in Order",
           subMenu: (d.subs || []).filter(s => s.name.trim()).map(s => ({ name: s.name, key: s.key })),
         })),
         mainScript: generatedMain,
         afterHoursScript: generatedAH,
+        afterHoursMode: ahMode,
+        afterHoursCustomOptions: ahMode === "custom" ? ahCustomOptions.filter(o => o.name.trim()).map(o => ({ name: o.name, key: o.key })) : null,
         configSummary: buildConfig(),
         fullScript: full,
         includeSpanish: document.getElementById("includeSpanish").checked,
@@ -874,4 +1000,3 @@ init();
 </script>
 </body>
 </html>
-
